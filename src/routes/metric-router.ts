@@ -25,9 +25,10 @@ function runSonarScanner(repoPath: string, projectKey: string) {
     const errPath = path.join(repoPath, 'scanner.err');
 
     try {
-        execSync(`sonar-scanner \
+        execSync(`sonar-scanner -X \
             -Dsonar.projectKey=${projectKey} \
-            -Dsonar.sources=. \
+            -Dsonar.sources=src \
+            -Dsonar.tests=tests,coverage \
             -Dsonar.host.url=${SONAR_HOST} \
             -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
             -Dsonar.testExecutionReportPaths=generic-report.xml \
@@ -67,8 +68,6 @@ async function getSonarMetrics(projectKey: string) {
 
     console.log('📊 SonarQube API Response:', JSON.stringify(response.data, null, 2));
 
-
-
     const values: Record<string, string> = {};
     for (const m of response.data.component.measures) {
         values[m.metric] = m.value;
@@ -98,18 +97,33 @@ metricRouter.get('/metrics', async (req, res) => {
 
     try {
         repoPath = cloneRepo(repo);
+
         await prepareRepoForSonarAnalysis(repoPath);
         runSonarScanner(repoPath, projectKey);
         await new Promise(resolve => setTimeout(resolve, 5000));
+
         console.log('🔍 Running SonarQube analysis...');
         const metrics = await getSonarMetrics(projectKey);
+
         console.log('Metrics collected...');
         res.json({ metrics });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Analysis failed' });
     } finally {
-        if (repoPath) fs.rmSync(repoPath, { recursive: true, force: true });
+        if (repoPath) {
+            const logPath = path.join(repoPath, 'scanner.log');
+            const errPath = path.join(repoPath, 'scanner.err');
+
+            if (fs.existsSync(logPath)) {
+                console.log('📄 Log:\n', fs.readFileSync(logPath, 'utf-8'));
+            }
+            if (fs.existsSync(errPath)) {
+                console.error('📄 Error Log:\n', fs.readFileSync(errPath, 'utf-8'));
+            }
+
+            fs.rmSync(repoPath, { recursive: true, force: true });
+        }
     }
 });
 

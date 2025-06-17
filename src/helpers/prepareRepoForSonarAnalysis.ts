@@ -16,53 +16,62 @@ export async function prepareRepoForSonarAnalysis(repoPath: string): Promise<voi
     const deps = { ...pkg.dependencies, ...pkg.devDependencies };
 
     if (deps.jest) {
-        console.log('🧪 Detected Jest – installing `jest-junit`...');
-        execSync('npm install --save-dev jest-junit', { cwd: repoPath, stdio: 'inherit' });
-
-        console.log('🧪 Running Jest with coverage and JUnit output...');
-        const jestConfigPath = path.join(repoPath, 'jest.config.js');
-        const junitConfig = `
-            module.exports = {
-                testResultsProcessor: "jest-junit",
-                reporters: ["default", ["jest-junit", { outputDirectory: ".", outputName: "report.xml" }]]
-            };
-        `;
-        fs.writeFileSync(jestConfigPath, junitConfig);
-        try {
-            execSync('npx jest --coverage', { cwd: repoPath, stdio: 'inherit' });
-        } catch (e) {
-            console.warn('⚠️ Some tests failed, but still trying to generate test report...');
-        }
-
-        const reportXml = path.join(repoPath, 'report.xml');
-        const genericXml = path.join(repoPath, 'generic-report.xml');
-
-        if (fs.existsSync(reportXml)) {
-            await convertJUnitToGeneric(reportXml, genericXml);
-        } else {
-            console.warn('⚠️ No JUnit report found — skipping conversion to generic format');
-        }
-
-
-
+        await runJestTestSuite(repoPath);
     } else if (deps.mocha) {
-        console.log('🧪 Detected Mocha – installing reporters and nyc...');
-        execSync('npm install --save-dev mocha mocha-junit-reporter nyc', { cwd: repoPath, stdio: 'inherit' });
-
-        console.log('🧪 Running Mocha with nyc for coverage...');
-        execSync('npx nyc mocha --reporter mocha-junit-reporter', { cwd: repoPath, stdio: 'inherit' });
-
-        const reportSrc = path.join(repoPath, 'test-results.xml');
-        const reportDest = path.join(repoPath, 'report.xml');
-        if (fs.existsSync(reportSrc)) fs.renameSync(reportSrc, reportDest);
+        await runMochaTestSuite(repoPath);
     } else {
         console.warn('⚠️ No known test runner detected. Skipping test execution.');
     }
+}
 
-    // Warn if no coverage info
-    const coveragePath = path.join(repoPath, 'coverage', 'lcov.info');
-    if (!fs.existsSync(coveragePath)) {
-        console.warn('⚠️ No coverage info found at coverage/lcov.info. Sonar coverage may be empty.');
+async function runJestTestSuite(repoPath: string): Promise<void> {
+    console.log('🧪 Detected Jest – installing `jest-junit`...');
+    execSync('npm install --save-dev jest-junit', { cwd: repoPath, stdio: 'inherit' });
+
+    console.log('🧪 Running Jest with coverage and JUnit output...');
+    const jestConfigPath = path.join(repoPath, 'jest.config.js');
+    const junitConfig = `
+        module.exports = {
+            testResultsProcessor: "jest-junit",
+            reporters: [
+                "default",
+                ["jest-junit", {
+                    outputDirectory: ".",
+                    outputName: "report.xml",
+                    suiteNameTemplate: "{filepath}", // this is the key setting
+                    classNameTemplate: "{classname}",
+                    titleTemplate: "{title}"
+                }]
+            ]
+        };
+    `;
+    fs.writeFileSync(jestConfigPath, junitConfig);
+
+    try {
+        execSync('npx jest --coverage', { cwd: repoPath, stdio: 'inherit' });
+    } catch (e) {
+        console.warn('⚠️ Some tests failed, but still trying to generate test report...');
     }
+
+    const reportXml = path.join(repoPath, 'report.xml');
+    const genericXml = path.join(repoPath, 'generic-report.xml');
+
+    if (fs.existsSync(reportXml)) {
+        await convertJUnitToGeneric(reportXml, genericXml);
+    } else {
+        console.warn('⚠️ No JUnit report found — skipping conversion to generic format');
+    }
+}
+
+async function runMochaTestSuite(repoPath: string): Promise<void> {
+    console.log('🧪 Detected Mocha – installing reporters and nyc...');
+    execSync('npm install --save-dev mocha mocha-junit-reporter nyc', { cwd: repoPath, stdio: 'inherit' });
+
+    console.log('🧪 Running Mocha with nyc for coverage...');
+    execSync('npx nyc mocha --reporter mocha-junit-reporter', { cwd: repoPath, stdio: 'inherit' });
+
+    const reportSrc = path.join(repoPath, 'test-results.xml');
+    const reportDest = path.join(repoPath, 'report.xml');
+    if (fs.existsSync(reportSrc)) fs.renameSync(reportSrc, reportDest);
 }
 

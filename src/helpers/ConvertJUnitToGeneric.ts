@@ -1,13 +1,14 @@
 import { parseStringPromise, Builder } from 'xml2js';
 import fs from 'fs';
-import path from 'path';
 
 interface TestCase {
     $: {
         name: string;
         duration: string;
-        status: string;
     };
+    failure?: any[];
+    error?: any[];
+    skipped?: any[];
 }
 
 interface TestFile {
@@ -17,7 +18,7 @@ interface TestFile {
 
 interface TestExecutions {
     testExecutions: {
-        $: { version: string }; // 👈 version field required
+        $: { version: string };
         file: TestFile[];
     };
 }
@@ -45,15 +46,25 @@ export async function convertJUnitToGeneric(inputPath: string, outputPath: strin
         for (const c of cases) {
             const name = c.$.name || 'unnamed';
             const duration = c.$.time ? Math.round(parseFloat(c.$.time) * 1000) : 0;
-            const status = c.failure || c.error ? 'failure' : 'success';
 
-            testFile.testCase.push({
+            const testCase: TestCase = {
                 $: {
                     name,
-                    duration: duration.toString(),
-                    status,
-                },
-            });
+                    duration: duration.toString()
+                }
+            };
+
+            if (Array.isArray(c.failure) && c.failure.length > 0) {
+                testCase.failure = [''];
+            }
+            if (Array.isArray(c.error) && c.error.length > 0) {
+                testCase.error = [''];
+            }
+            if (Array.isArray(c.skipped) && c.skipped.length > 0) {
+                testCase.skipped = [''];
+            }
+
+            testFile.testCase.push(testCase);
         }
 
         testExecutions.testExecutions.file.push(testFile);
