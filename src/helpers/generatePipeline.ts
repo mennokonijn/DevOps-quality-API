@@ -12,6 +12,10 @@ export type MetricToolMap = Record<string, {
     steps: MetricToolStep[];
 }>;
 
+// Make fixed when deployed
+const ngrokUrl = 'https://e101-144-178-66-36.ngrok-free.app';
+
+
 export const METRIC_MAP: Record<string, Record<string, MetricToolMap[string]>> = {
     javascript: {
         "Code Smells": {
@@ -140,12 +144,38 @@ export function generateGitHubActionsYaml(
 ): string {
     const allSteps: MetricToolStep[] = [];
     const allTools = new Set<string>();
+    const NGROK_URL = ngrokUrl; // 👈 Replace with your current ngrok URL
+
+    function addResultPostStep(filename: string, toolName: string): MetricToolStep {
+        return {
+            name: `Send ${toolName} results to API`,
+            command: `curl -X POST ${NGROK_URL}/api/metrics \\
+  -H "Content-Type: application/json" \\
+  -H "X-Tool-Name: ${toolName}" \\
+  --data @${filename}`
+        };
+    }
 
     selectedMetrics.forEach(metric => {
         const config = METRIC_MAP[language][metric];
         if (config) {
             config.steps.forEach(step => allSteps.push(step));
             config.tools.forEach(tool => allTools.add(tool));
+
+            // Add result upload steps for tools with output
+            if (metric === 'CVEs and CVSS') {
+                allSteps.push(addResultPostStep('trivy-results.json', 'Trivy'));
+            }
+            if (metric === 'Secret Detection') {
+                allSteps.push(addResultPostStep('gitleaks.json', 'GitLeaks'));
+            }
+            if (metric === 'Test Success Density') {
+                if (language === 'javascript') {
+                    allSteps.push(addResultPostStep('jest-results.json', 'Jest'));
+                } else {
+                    allSteps.push(addResultPostStep('pytest-results.xml', 'Pytest'));
+                }
+            }
         }
     });
 
@@ -161,7 +191,6 @@ export function generateGitHubActionsYaml(
         });
     }
 
-
     if (allTools.has('SonarQube')) {
         allSteps.push({
             name: 'Install SonarScanner',
@@ -169,15 +198,26 @@ export function generateGitHubActionsYaml(
         });
         allSteps.push({
             name: 'Run SonarQube Analysis',
-            command: 'sonar-scanner -Dsonar.token=${{ secrets.SONAR_TOKEN }}'
+            command: `sonar-scanner \\
+  -Dsonar.projectKey=\${{ secrets.SONAR_PROJECT_KEY }} \\
+  -Dsonar.sources=. \\
+  -Dsonar.host.url=\${{ secrets.SONAR_HOST_URL }} \\
+  -Dsonar.login=\${{ secrets.SONAR_TOKEN }}`
         });
+        allSteps.push({
+            name: 'Fetch SonarQube results',
+            command: `curl -s -u \${{ secrets.SONAR_TOKEN }}: \\
+  "\${{ secrets.SONAR_HOST_URL }}/api/qualitygates/project_status?projectKey=\${{ secrets.SONAR_PROJECT_KEY }}" \\
+  -o sonar-results.json`
+        });
+        allSteps.push(addResultPostStep('sonar-results.json', 'SonarQube'));
     }
 
     const stepsYaml = allSteps.map(step => {
         if (typeof step.command === 'string') {
             const indentedCommand = step.command
                 .split('\n')
-                .map(line => `          ${line.trim()}`) // 10 spaces
+                .map(line => `          ${line.trim()}`)
                 .join('\n');
 
             return `      - name: ${step.name}

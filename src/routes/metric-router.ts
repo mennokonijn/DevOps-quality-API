@@ -3,34 +3,35 @@ import fs from 'fs';
 import path from 'path';
 
 const router = express.Router();
+const BASE_RESULTS_DIR = path.join(__dirname, '../../data/results');
 
-// This folder will store the posted metric results
-const RESULTS_DIR = path.join(__dirname, '../../data/results');
-
-// Ensure the directory exists
-if (!fs.existsSync(RESULTS_DIR)) {
-    fs.mkdirSync(RESULTS_DIR, { recursive: true });
+if (!fs.existsSync(BASE_RESULTS_DIR)) {
+    fs.mkdirSync(BASE_RESULTS_DIR, { recursive: true });
 }
 
-router.post('/metrics', (req, res) => {
-    const { repo, commit, tool, rawTextOutput } = req.body;
 
-    if (!repo || !commit || !tool || !rawTextOutput) {
-        return res.status(400).json({ error: 'Missing required fields' });
-    }
-
+router.post('/metrics', express.json(), (req, res) => {
+    const tool = req.headers['x-tool-name'] as string || 'unknown';
+    const repo = req.headers['x-repo-name'] as string || 'unknown-repo';
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const filename = `${repo.replace(/\//g, '_')}--${tool}--${commit}--${timestamp}.json`;
-    const filePath = path.join(RESULTS_DIR, filename);
+    const filename = `${tool}-${timestamp}.json`;
+
+    const folderPath = path.join(BASE_RESULTS_DIR, repo, tool);
+    const filePath = path.join(folderPath, filename);
 
     try {
-        fs.writeFileSync(filePath, JSON.stringify({ repo, commit, tool, rawTextOutput }, null, 2));
-        console.log(`✅ Saved results for ${tool} from ${repo}@${commit}`);
-        res.status(200).json({ status: 'ok' });
+        fs.mkdirSync(folderPath, { recursive: true });
+        fs.writeFileSync(filePath, JSON.stringify(req.body, null, 2), 'utf-8');
+        console.log(`✅ Saved ${tool} result for repo "${repo}" → ${filePath}`);
+        res.status(200).json({ message: 'Result saved', filename });
     } catch (err) {
-        console.error('❌ Failed to save results:', err);
-        res.status(500).json({ error: 'Failed to save results' });
+        console.error('❌ Error saving result:', err);
+        res.status(500).json({ error: 'Failed to save result' });
     }
+});
+
+router.post('/extract-results', express.json(), (req, res) => {
+
 });
 
 export default router;
