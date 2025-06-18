@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import metricRouter from "./routes/metric-router";
+import generateYamlRouter from './routes/generate-yaml-router';
 
 const app = express();
 app.use(cors());
@@ -11,6 +12,7 @@ app.get('/api/health', (req: Request, res: Response) => {
 });
 
 app.use('/api', metricRouter);
+app.use('/api', generateYamlRouter);
 
 app.listen(4000, () => {
     console.log('Server running on http://localhost:4000');
