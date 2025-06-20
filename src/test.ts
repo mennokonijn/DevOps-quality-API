@@ -1,27 +1,32 @@
-const dummyMetrics: { [key: string]: { name: string; value: string | number }[] } = {
-    Planning: [
-        { name: 'Requirements Volatility', value: 'Low' },
-        { name: 'Requirements Completeness', value: '85%' }
+export const dummyMetricData: Record<string, { name: string; value: string }[]> = {
+    Plan: [
+        { name: 'Requirements Volatility', value: '-' },
+        { name: 'Requirements Completeness', value: '-' },
     ],
-    Coding: [
-        { name: 'Cyclomatic Complexity', value: 12 },
-        { name: 'Cognitive Complexity', value: 9 },
-        { name: 'Code Smells', value: 5 },
-        { name: 'Duplicated Lines Density', value: '2.4%' },
-        { name: 'Programming Language Impact', value: '300 DRAM' }
+    Code: [
+        { name: 'Cyclomatic Complexity', value: '25' },
+        { name: 'Cognitive Complexity', value: '67' },
+        { name: 'Code Smells', value: '10' },
+        { name: 'Duplicated Lines Density', value: '20' },
+        { name: 'CVE identifiers and CVSS scores', value: '30' },
+        { name: 'Programming Language Impact', value: '-' },
     ],
-    Testing: [
-        { name: 'Total Coverage', value: '87%' },
-        { name: 'Test Success Density', value: '91%' }
+    Build: [
+        { name: 'Unused Libraries', value: '-' },
     ],
-    Deploying: [
-        { name: 'Change Failure Rate', value: '3%' },
-        { name: 'Mean Time to Recover', value: '15m' }
+    Test: [
+        { name: 'Total Coverage', value: '67%' },
+        { name: 'Test Success Density', value: '95%' },
     ],
-    Maintaining: [
-        { name: 'Defect Density', value: 0.02 },
-        { name: 'Customer Satisfaction', value: '4.5/5' },
-        { name: 'Unused Libraries', value: 2 },
-        { name: 'Runtime Performance', value: '98%' }
-    ]
+    'Deploy/Release': [
+        { name: 'Change Failure Rate (CFR)', value: '-' },
+        { name: 'Secret Detection', value: '-' },
+        { name: 'Mean Time to Restore (MTTR)', value: '-' },
+    ],
+    Operate: [
+        { name: 'Customer Satisfaction', value: '-' },
+    ],
+    Monitor: [
+        { name: 'Defect Density', value: '-' },
+    ],
 };

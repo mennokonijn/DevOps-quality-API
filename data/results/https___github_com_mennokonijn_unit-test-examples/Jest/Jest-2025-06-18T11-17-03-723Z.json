@@ -23,29 +23,9 @@
     "unmatched": 0,
     "updated": 0
   },
-  "startTime": 1750236695568,
+  "startTime": 1750245421247,
   "success": true,
   "testResults": [
-    {
-      "assertionResults": [
-        {
-          "ancestorTitles": [
-            "<Answer />"
-          ],
-          "failureMessages": [],
-          "fullName": "<Answer /> should render an answer according to the passed props",
-          "location": null,
-          "status": "passed",
-          "title": "should render an answer according to the passed props"
-        }
-      ],
-      "endTime": 1750236697217,
-      "message": "",
-      "name": "/home/runner/work/unit-test-examples/unit-test-examples/tests/js/Answer.test.js",
-      "startTime": 1750236696927,
-      "status": "passed",
-      "summary": ""
-    },
     {
       "assertionResults": [
         {
@@ -59,30 +39,10 @@
           "title": "should return the answer to life, universe and everything, in the current language"
         }
       ],
-      "endTime": 1750236697318,
+      "endTime": 1750245422920,
       "message": "",
       "name": "/home/runner/work/unit-test-examples/unit-test-examples/tests/js/TranslatingOracle.test.js",
-      "startTime": 1750236697085,
-      "status": "passed",
-      "summary": ""
-    },
-    {
-      "assertionResults": [
-        {
-          "ancestorTitles": [
-            "<ReactOracle />"
-          ],
-          "failureMessages": [],
-          "fullName": "<ReactOracle /> should render list of answers passed props",
-          "location": null,
-          "status": "passed",
-          "title": "should render list of answers passed props"
-        }
-      ],
-      "endTime": 1750236697408,
-      "message": "",
-      "name": "/home/runner/work/unit-test-examples/unit-test-examples/tests/js/ReactOracle.test.js",
-      "startTime": 1750236697282,
+      "startTime": 1750245422696,
       "status": "passed",
       "summary": ""
     },
@@ -259,10 +219,50 @@
           "title": "should consult the oracle for enough money (100)"
         }
       ],
-      "endTime": 1750236697409,
+      "endTime": 1750245422999,
       "message": "",
       "name": "/home/runner/work/unit-test-examples/unit-test-examples/tests/js/FortuneTeller.test.js",
-      "startTime": 1750236697100,
+      "startTime": 1750245422681,
+      "status": "passed",
+      "summary": ""
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "<Answer />"
+          ],
+          "failureMessages": [],
+          "fullName": "<Answer /> should render an answer according to the passed props",
+          "location": null,
+          "status": "passed",
+          "title": "should render an answer according to the passed props"
+        }
+      ],
+      "endTime": 1750245423058,
+      "message": "",
+      "name": "/home/runner/work/unit-test-examples/unit-test-examples/tests/js/Answer.test.js",
+      "startTime": 1750245422762,
+      "status": "passed",
+      "summary": ""
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "<ReactOracle />"
+          ],
+          "failureMessages": [],
+          "fullName": "<ReactOracle /> should render list of answers passed props",
+          "location": null,
+          "status": "passed",
+          "title": "should render list of answers passed props"
+        }
+      ],
+      "endTime": 1750245423111,
+      "message": "",
+      "name": "/home/runner/work/unit-test-examples/unit-test-examples/tests/js/ReactOracle.test.js",
+      "startTime": 1750245423007,
       "status": "passed",
       "summary": ""
     },
@@ -279,10 +279,10 @@
           "title": "should return the answer to life, universe and everything"
         }
       ],
-      "endTime": 1750236697468,
+      "endTime": 1750245423143,
       "message": "",
       "name": "/home/runner/work/unit-test-examples/unit-test-examples/tests/js/Oracle.test.js",
-      "startTime": 1750236697389,
+      "startTime": 1750245423074,
       "status": "passed",
       "summary": ""
     },
@@ -299,10 +299,10 @@
           "title": "should return the answer to life, universe and everything"
         }
       ],
-      "endTime": 1750236697504,
+      "endTime": 1750245423190,
       "message": "",
       "name": "/home/runner/work/unit-test-examples/unit-test-examples/tests/js/functions.test.js",
-      "startTime": 1750236697477,
+      "startTime": 1750245423124,
       "status": "passed",
       "summary": ""
     }
@@ -332,6 +332,237 @@
       "b": {},
       "_coverageSchema": "332fd63041d2c1bcb487cc26dd0d5f7d97098a6c",
       "hash": "d1d95e640bbb65ad28b7d833670584ed7aa4dbcd"
+    },
+    "/home/runner/work/unit-test-examples/unit-test-examples/src/js/TranslatingOracle.js": {
+      "path": "/home/runner/work/unit-test-examples/unit-test-examples/src/js/TranslatingOracle.js",
+      "statementMap": {
+        "0": {
+          "start": {
+            "line": 10,
+            "column": 2
+          },
+          "end": {
+            "line": 10,
+            "column": 67
+          }
+        }
+      },
+      "fnMap": {
+        "0": {
+          "name": "(anonymous_0)",
+          "decl": {
+            "start": {
+              "line": 9,
+              "column": 1
+            },
+            "end": {
+              "line": 9,
+              "column": 2
+            }
+          },
+          "loc": {
+            "start": {
+              "line": 9,
+              "column": 10
+            },
+            "end": {
+              "line": 11,
+              "column": 2
+            }
+          },
+          "line": 9
+        }
+      },
+      "branchMap": {},
+      "s": {
+        "0": 1
+      },
+      "f": {
+        "0": 1
+      },
+      "b": {},
+      "_coverageSchema": "332fd63041d2c1bcb487cc26dd0d5f7d97098a6c",
+      "hash": "8d8d9eb50d01f07eab1778c3f618a5a70f2df6ea"
+    },
+    "/home/runner/work/unit-test-examples/unit-test-examples/src/js/FortuneTeller.js": {
+      "path": "/home/runner/work/unit-test-examples/unit-test-examples/src/js/FortuneTeller.js",
+      "statementMap": {
+        "0": {
+          "start": {
+            "line": 10,
+            "column": 2
+          },
+          "end": {
+            "line": 10,
+            "column": 23
+          }
+        },
+        "1": {
+          "start": {
+            "line": 20,
+            "column": 2
+          },
+          "end": {
+            "line": 24,
+            "column": 3
+          }
+        },
+        "2": {
+          "start": {
+            "line": 21,
+            "column": 3
+          },
+          "end": {
+            "line": 21,
+            "column": 31
+          }
+        },
+        "3": {
+          "start": {
+            "line": 23,
+            "column": 3
+          },
+          "end": {
+            "line": 23,
+            "column": 13
+          }
+        }
+      },
+      "fnMap": {
+        "0": {
+          "name": "(anonymous_0)",
+          "decl": {
+            "start": {
+              "line": 9,
+              "column": 1
+            },
+            "end": {
+              "line": 9,
+              "column": 2
+            }
+          },
+          "loc": {
+            "start": {
+              "line": 9,
+              "column": 23
+            },
+            "end": {
+              "line": 11,
+              "column": 2
+            }
+          },
+          "line": 9
+        },
+        "1": {
+          "name": "(anonymous_1)",
+          "decl": {
+            "start": {
+              "line": 18,
+              "column": 1
+            },
+            "end": {
+              "line": 18,
+              "column": 2
+            }
+          },
+          "loc": {
+            "start": {
+              "line": 18,
+              "column": 21
+            },
+            "end": {
+              "line": 25,
+              "column": 2
+            }
+          },
+          "line": 18
+        }
+      },
+      "branchMap": {
+        "0": {
+          "loc": {
+            "start": {
+              "line": 18,
+              "column": 9
+            },
+            "end": {
+              "line": 18,
+              "column": 18
+            }
+          },
+          "type": "default-arg",
+          "locations": [
+            {
+              "start": {
+                "line": 18,
+                "column": 17
+              },
+              "end": {
+                "line": 18,
+                "column": 18
+              }
+            }
+          ],
+          "line": 18
+        },
+        "1": {
+          "loc": {
+            "start": {
+              "line": 20,
+              "column": 2
+            },
+            "end": {
+              "line": 24,
+              "column": 3
+            }
+          },
+          "type": "if",
+          "locations": [
+            {
+              "start": {
+                "line": 20,
+                "column": 2
+              },
+              "end": {
+                "line": 24,
+                "column": 3
+              }
+            },
+            {
+              "start": {
+                "line": 20,
+                "column": 2
+              },
+              "end": {
+                "line": 24,
+                "column": 3
+              }
+            }
+          ],
+          "line": 20
+        }
+      },
+      "s": {
+        "0": 17,
+        "1": 17,
+        "2": 4,
+        "3": 13
+      },
+      "f": {
+        "0": 17,
+        "1": 17
+      },
+      "b": {
+        "0": [
+          1
+        ],
+        "1": [
+          4,
+          13
+        ]
+      },
+      "_coverageSchema": "332fd63041d2c1bcb487cc26dd0d5f7d97098a6c",
+      "hash": "619ac1268043a25d3e8b20407f54c5149a70a91a"
     },
     "/home/runner/work/unit-test-examples/unit-test-examples/src/js/Answer.js": {
       "path": "/home/runner/work/unit-test-examples/unit-test-examples/src/js/Answer.js",
@@ -405,57 +636,6 @@
       "b": {},
       "_coverageSchema": "332fd63041d2c1bcb487cc26dd0d5f7d97098a6c",
       "hash": "4aa01d10bb674ed4b86ecf9ff1db39d17c528c23"
-    },
-    "/home/runner/work/unit-test-examples/unit-test-examples/src/js/TranslatingOracle.js": {
-      "path": "/home/runner/work/unit-test-examples/unit-test-examples/src/js/TranslatingOracle.js",
-      "statementMap": {
-        "0": {
-          "start": {
-            "line": 10,
-            "column": 2
-          },
-          "end": {
-            "line": 10,
-            "column": 67
-          }
-        }
-      },
-      "fnMap": {
-        "0": {
-          "name": "(anonymous_0)",
-          "decl": {
-            "start": {
-              "line": 9,
-              "column": 1
-            },
-            "end": {
-              "line": 9,
-              "column": 2
-            }
-          },
-          "loc": {
-            "start": {
-              "line": 9,
-              "column": 10
-            },
-            "end": {
-              "line": 11,
-              "column": 2
-            }
-          },
-          "line": 9
-        }
-      },
-      "branchMap": {},
-      "s": {
-        "0": 1
-      },
-      "f": {
-        "0": 1
-      },
-      "b": {},
-      "_coverageSchema": "332fd63041d2c1bcb487cc26dd0d5f7d97098a6c",
-      "hash": "8d8d9eb50d01f07eab1778c3f618a5a70f2df6ea"
     },
     "/home/runner/work/unit-test-examples/unit-test-examples/src/js/ReactOracle.js": {
       "path": "/home/runner/work/unit-test-examples/unit-test-examples/src/js/ReactOracle.js",
@@ -554,164 +734,6 @@
       "b": {},
       "_coverageSchema": "332fd63041d2c1bcb487cc26dd0d5f7d97098a6c",
       "hash": "b97581665bd41e169edbfb9928686f4b2e1d57d4"
-    },
-    "/home/runner/work/unit-test-examples/unit-test-examples/src/js/FortuneTeller.js": {
-      "path": "/home/runner/work/unit-test-examples/unit-test-examples/src/js/FortuneTeller.js",
-      "statementMap": {
-        "0": {
-          "start": {
-            "line": 10,
-            "column": 2
-          },
-          "end": {
-            "line": 10,
-            "column": 23
-          }
-        },
-        "1": {
-          "start": {
-            "line": 19,
-            "column": 2
-          },
-          "end": {
-            "line": 19,
-            "column": 62
-          }
-        }
-      },
-      "fnMap": {
-        "0": {
-          "name": "(anonymous_0)",
-          "decl": {
-            "start": {
-              "line": 9,
-              "column": 1
-            },
-            "end": {
-              "line": 9,
-              "column": 2
-            }
-          },
-          "loc": {
-            "start": {
-              "line": 9,
-              "column": 23
-            },
-            "end": {
-              "line": 11,
-              "column": 2
-            }
-          },
-          "line": 9
-        },
-        "1": {
-          "name": "(anonymous_1)",
-          "decl": {
-            "start": {
-              "line": 18,
-              "column": 1
-            },
-            "end": {
-              "line": 18,
-              "column": 2
-            }
-          },
-          "loc": {
-            "start": {
-              "line": 18,
-              "column": 21
-            },
-            "end": {
-              "line": 20,
-              "column": 2
-            }
-          },
-          "line": 18
-        }
-      },
-      "branchMap": {
-        "0": {
-          "loc": {
-            "start": {
-              "line": 18,
-              "column": 9
-            },
-            "end": {
-              "line": 18,
-              "column": 18
-            }
-          },
-          "type": "default-arg",
-          "locations": [
-            {
-              "start": {
-                "line": 18,
-                "column": 17
-              },
-              "end": {
-                "line": 18,
-                "column": 18
-              }
-            }
-          ],
-          "line": 18
-        },
-        "1": {
-          "loc": {
-            "start": {
-              "line": 19,
-              "column": 9
-            },
-            "end": {
-              "line": 19,
-              "column": 61
-            }
-          },
-          "type": "cond-expr",
-          "locations": [
-            {
-              "start": {
-                "line": 19,
-                "column": 36
-              },
-              "end": {
-                "line": 19,
-                "column": 56
-              }
-            },
-            {
-              "start": {
-                "line": 19,
-                "column": 59
-              },
-              "end": {
-                "line": 19,
-                "column": 61
-              }
-            }
-          ],
-          "line": 19
-        }
-      },
-      "s": {
-        "0": 17,
-        "1": 17
-      },
-      "f": {
-        "0": 17,
-        "1": 17
-      },
-      "b": {
-        "0": [
-          1
-        ],
-        "1": [
-          4,
-          13
-        ]
-      },
-      "_coverageSchema": "332fd63041d2c1bcb487cc26dd0d5f7d97098a6c",
-      "hash": "ac793802597ad90a1ad33b21bf44fd6b4a835fe9"
     },
     "/home/runner/work/unit-test-examples/unit-test-examples/src/js/Oracle.js": {
       "path": "/home/runner/work/unit-test-examples/unit-test-examples/src/js/Oracle.js",

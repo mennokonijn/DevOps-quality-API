@@ -1,0 +1,1476 @@
+{
+  "numFailedTestSuites": 0,
+  "numFailedTests": 0,
+  "numPassedTestSuites": 6,
+  "numPassedTests": 22,
+  "numPendingTestSuites": 0,
+  "numPendingTests": 0,
+  "numRuntimeErrorTestSuites": 0,
+  "numTotalTestSuites": 6,
+  "numTotalTests": 22,
+  "snapshot": {
+    "added": 0,
+    "didUpdate": false,
+    "failure": false,
+    "filesAdded": 0,
+    "filesRemoved": 0,
+    "filesUnmatched": 0,
+    "filesUpdated": 0,
+    "matched": 1,
+    "total": 1,
+    "unchecked": 0,
+    "uncheckedKeys": [],
+    "unmatched": 0,
+    "updated": 0
+  },
+  "startTime": 1750245973753,
+  "success": true,
+  "testResults": [
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "TranslatingOracle"
+          ],
+          "failureMessages": [],
+          "fullName": "TranslatingOracle should return the answer to life, universe and everything, in the current language",
+          "location": null,
+          "status": "passed",
+          "title": "should return the answer to life, universe and everything, in the current language"
+        }
+      ],
+      "endTime": 1750245975439,
+      "message": "",
+      "name": "/home/runner/work/unit-test-examples/unit-test-examples/tests/js/TranslatingOracle.test.js",
+      "startTime": 1750245975205,
+      "status": "passed",
+      "summary": ""
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "<Answer />"
+          ],
+          "failureMessages": [],
+          "fullName": "<Answer /> should render an answer according to the passed props",
+          "location": null,
+          "status": "passed",
+          "title": "should render an answer according to the passed props"
+        }
+      ],
+      "endTime": 1750245975515,
+      "message": "",
+      "name": "/home/runner/work/unit-test-examples/unit-test-examples/tests/js/Answer.test.js",
+      "startTime": 1750245975213,
+      "status": "passed",
+      "summary": ""
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "FortuneTeller"
+          ],
+          "failureMessages": [],
+          "fullName": "FortuneTeller should remain silent for invalid or not enough money (0)",
+          "location": null,
+          "status": "passed",
+          "title": "should remain silent for invalid or not enough money (0)"
+        },
+        {
+          "ancestorTitles": [
+            "FortuneTeller"
+          ],
+          "failureMessages": [],
+          "fullName": "FortuneTeller should remain silent for invalid or not enough money (4)",
+          "location": null,
+          "status": "passed",
+          "title": "should remain silent for invalid or not enough money (4)"
+        },
+        {
+          "ancestorTitles": [
+            "FortuneTeller"
+          ],
+          "failureMessages": [],
+          "fullName": "FortuneTeller should remain silent for invalid or not enough money (-5)",
+          "location": null,
+          "status": "passed",
+          "title": "should remain silent for invalid or not enough money (-5)"
+        },
+        {
+          "ancestorTitles": [
+            "FortuneTeller"
+          ],
+          "failureMessages": [],
+          "fullName": "FortuneTeller should remain silent for invalid or not enough money (\"\")",
+          "location": null,
+          "status": "passed",
+          "title": "should remain silent for invalid or not enough money (\"\")"
+        },
+        {
+          "ancestorTitles": [
+            "FortuneTeller"
+          ],
+          "failureMessages": [],
+          "fullName": "FortuneTeller should remain silent for invalid or not enough money (\"0\")",
+          "location": null,
+          "status": "passed",
+          "title": "should remain silent for invalid or not enough money (\"0\")"
+        },
+        {
+          "ancestorTitles": [
+            "FortuneTeller"
+          ],
+          "failureMessages": [],
+          "fullName": "FortuneTeller should remain silent for invalid or not enough money (\"4\")",
+          "location": null,
+          "status": "passed",
+          "title": "should remain silent for invalid or not enough money (\"4\")"
+        },
+        {
+          "ancestorTitles": [
+            "FortuneTeller"
+          ],
+          "failureMessages": [],
+          "fullName": "FortuneTeller should remain silent for invalid or not enough money (\"-5\")",
+          "location": null,
+          "status": "passed",
+          "title": "should remain silent for invalid or not enough money (\"-5\")"
+        },
+        {
+          "ancestorTitles": [
+            "FortuneTeller"
+          ],
+          "failureMessages": [],
+          "fullName": "FortuneTeller should remain silent for invalid or not enough money (undefined)",
+          "location": null,
+          "status": "passed",
+          "title": "should remain silent for invalid or not enough money (undefined)"
+        },
+        {
+          "ancestorTitles": [
+            "FortuneTeller"
+          ],
+          "failureMessages": [],
+          "fullName": "FortuneTeller should remain silent for invalid or not enough money (null)",
+          "location": null,
+          "status": "passed",
+          "title": "should remain silent for invalid or not enough money (null)"
+        },
+        {
+          "ancestorTitles": [
+            "FortuneTeller"
+          ],
+          "failureMessages": [],
+          "fullName": "FortuneTeller should remain silent for invalid or not enough money (true)",
+          "location": null,
+          "status": "passed",
+          "title": "should remain silent for invalid or not enough money (true)"
+        },
+        {
+          "ancestorTitles": [
+            "FortuneTeller"
+          ],
+          "failureMessages": [],
+          "fullName": "FortuneTeller should remain silent for invalid or not enough money (false)",
+          "location": null,
+          "status": "passed",
+          "title": "should remain silent for invalid or not enough money (false)"
+        },
+        {
+          "ancestorTitles": [
+            "FortuneTeller"
+          ],
+          "failureMessages": [],
+          "fullName": "FortuneTeller should remain silent for invalid or not enough money ([])",
+          "location": null,
+          "status": "passed",
+          "title": "should remain silent for invalid or not enough money ([])"
+        },
+        {
+          "ancestorTitles": [
+            "FortuneTeller"
+          ],
+          "failureMessages": [],
+          "fullName": "FortuneTeller should remain silent for invalid or not enough money ({})",
+          "location": null,
+          "status": "passed",
+          "title": "should remain silent for invalid or not enough money ({})"
+        },
+        {
+          "ancestorTitles": [
+            "FortuneTeller"
+          ],
+          "failureMessages": [],
+          "fullName": "FortuneTeller should consult the oracle for enough money (5)",
+          "location": null,
+          "status": "passed",
+          "title": "should consult the oracle for enough money (5)"
+        },
+        {
+          "ancestorTitles": [
+            "FortuneTeller"
+          ],
+          "failureMessages": [],
+          "fullName": "FortuneTeller should consult the oracle for enough money (100)",
+          "location": null,
+          "status": "passed",
+          "title": "should consult the oracle for enough money (100)"
+        },
+        {
+          "ancestorTitles": [
+            "FortuneTeller"
+          ],
+          "failureMessages": [],
+          "fullName": "FortuneTeller should consult the oracle for enough money (5)",
+          "location": null,
+          "status": "passed",
+          "title": "should consult the oracle for enough money (5)"
+        },
+        {
+          "ancestorTitles": [
+            "FortuneTeller"
+          ],
+          "failureMessages": [],
+          "fullName": "FortuneTeller should consult the oracle for enough money (100)",
+          "location": null,
+          "status": "passed",
+          "title": "should consult the oracle for enough money (100)"
+        }
+      ],
+      "endTime": 1750245975633,
+      "message": "",
+      "name": "/home/runner/work/unit-test-examples/unit-test-examples/tests/js/FortuneTeller.test.js",
+      "startTime": 1750245975236,
+      "status": "passed",
+      "summary": ""
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "<ReactOracle />"
+          ],
+          "failureMessages": [],
+          "fullName": "<ReactOracle /> should render list of answers passed props",
+          "location": null,
+          "status": "passed",
+          "title": "should render list of answers passed props"
+        }
+      ],
+      "endTime": 1750245975640,
+      "message": "",
+      "name": "/home/runner/work/unit-test-examples/unit-test-examples/tests/js/ReactOracle.test.js",
+      "startTime": 1750245975513,
+      "status": "passed",
+      "summary": ""
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "Oracle"
+          ],
+          "failureMessages": [],
+          "fullName": "Oracle should return the answer to life, universe and everything",
+          "location": null,
+          "status": "passed",
+          "title": "should return the answer to life, universe and everything"
+        }
+      ],
+      "endTime": 1750245975676,
+      "message": "",
+      "name": "/home/runner/work/unit-test-examples/unit-test-examples/tests/js/Oracle.test.js",
+      "startTime": 1750245975576,
+      "status": "passed",
+      "summary": ""
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "getAnswer"
+          ],
+          "failureMessages": [],
+          "fullName": "getAnswer should return the answer to life, universe and everything",
+          "location": null,
+          "status": "passed",
+          "title": "should return the answer to life, universe and everything"
+        }
+      ],
+      "endTime": 1750245975734,
+      "message": "",
+      "name": "/home/runner/work/unit-test-examples/unit-test-examples/tests/js/functions.test.js",
+      "startTime": 1750245975707,
+      "status": "passed",
+      "summary": ""
+    }
+  ],
+  "wasInterrupted": false,
+  "coverageMap": {
+    "/home/runner/work/unit-test-examples/unit-test-examples/tests/js/setupTests.js": {
+      "path": "/home/runner/work/unit-test-examples/unit-test-examples/tests/js/setupTests.js",
+      "statementMap": {
+        "0": {
+          "start": {
+            "line": 4,
+            "column": 0
+          },
+          "end": {
+            "line": 6,
+            "column": 4
+          }
+        }
+      },
+      "fnMap": {},
+      "branchMap": {},
+      "s": {
+        "0": 6
+      },
+      "f": {},
+      "b": {},
+      "_coverageSchema": "332fd63041d2c1bcb487cc26dd0d5f7d97098a6c",
+      "hash": "d1d95e640bbb65ad28b7d833670584ed7aa4dbcd"
+    },
+    "/home/runner/work/unit-test-examples/unit-test-examples/src/js/TranslatingOracle.js": {
+      "path": "/home/runner/work/unit-test-examples/unit-test-examples/src/js/TranslatingOracle.js",
+      "statementMap": {
+        "0": {
+          "start": {
+            "line": 10,
+            "column": 2
+          },
+          "end": {
+            "line": 10,
+            "column": 67
+          }
+        }
+      },
+      "fnMap": {
+        "0": {
+          "name": "(anonymous_0)",
+          "decl": {
+            "start": {
+              "line": 9,
+              "column": 1
+            },
+            "end": {
+              "line": 9,
+              "column": 2
+            }
+          },
+          "loc": {
+            "start": {
+              "line": 9,
+              "column": 10
+            },
+            "end": {
+              "line": 11,
+              "column": 2
+            }
+          },
+          "line": 9
+        }
+      },
+      "branchMap": {},
+      "s": {
+        "0": 1
+      },
+      "f": {
+        "0": 1
+      },
+      "b": {},
+      "_coverageSchema": "332fd63041d2c1bcb487cc26dd0d5f7d97098a6c",
+      "hash": "8d8d9eb50d01f07eab1778c3f618a5a70f2df6ea"
+    },
+    "/home/runner/work/unit-test-examples/unit-test-examples/src/js/Answer.js": {
+      "path": "/home/runner/work/unit-test-examples/unit-test-examples/src/js/Answer.js",
+      "statementMap": {
+        "0": {
+          "start": {
+            "line": 3,
+            "column": 15
+          },
+          "end": {
+            "line": 11,
+            "column": 1
+          }
+        },
+        "1": {
+          "start": {
+            "line": 4,
+            "column": 22
+          },
+          "end": {
+            "line": 4,
+            "column": 27
+          }
+        },
+        "2": {
+          "start": {
+            "line": 6,
+            "column": 1
+          },
+          "end": {
+            "line": 10,
+            "column": 3
+          }
+        }
+      },
+      "fnMap": {
+        "0": {
+          "name": "(anonymous_0)",
+          "decl": {
+            "start": {
+              "line": 3,
+              "column": 15
+            },
+            "end": {
+              "line": 3,
+              "column": 16
+            }
+          },
+          "loc": {
+            "start": {
+              "line": 3,
+              "column": 28
+            },
+            "end": {
+              "line": 11,
+              "column": 1
+            }
+          },
+          "line": 3
+        }
+      },
+      "branchMap": {},
+      "s": {
+        "0": 2,
+        "1": 1,
+        "2": 1
+      },
+      "f": {
+        "0": 1
+      },
+      "b": {},
+      "_coverageSchema": "332fd63041d2c1bcb487cc26dd0d5f7d97098a6c",
+      "hash": "4aa01d10bb674ed4b86ecf9ff1db39d17c528c23"
+    },
+    "/home/runner/work/unit-test-examples/unit-test-examples/src/js/FortuneTeller.js": {
+      "path": "/home/runner/work/unit-test-examples/unit-test-examples/src/js/FortuneTeller.js",
+      "statementMap": {
+        "0": {
+          "start": {
+            "line": 10,
+            "column": 2
+          },
+          "end": {
+            "line": 10,
+            "column": 23
+          }
+        },
+        "1": {
+          "start": {
+            "line": 20,
+            "column": 2
+          },
+          "end": {
+            "line": 24,
+            "column": 3
+          }
+        },
+        "2": {
+          "start": {
+            "line": 21,
+            "column": 3
+          },
+          "end": {
+            "line": 21,
+            "column": 31
+          }
+        },
+        "3": {
+          "start": {
+            "line": 23,
+            "column": 3
+          },
+          "end": {
+            "line": 23,
+            "column": 13
+          }
+        },
+        "4": {
+          "start": {
+            "line": 34,
+            "column": 2
+          },
+          "end": {
+            "line": 38,
+            "column": 3
+          }
+        },
+        "5": {
+          "start": {
+            "line": 35,
+            "column": 3
+          },
+          "end": {
+            "line": 35,
+            "column": 31
+          }
+        },
+        "6": {
+          "start": {
+            "line": 37,
+            "column": 3
+          },
+          "end": {
+            "line": 37,
+            "column": 13
+          }
+        },
+        "7": {
+          "start": {
+            "line": 48,
+            "column": 2
+          },
+          "end": {
+            "line": 52,
+            "column": 3
+          }
+        },
+        "8": {
+          "start": {
+            "line": 49,
+            "column": 3
+          },
+          "end": {
+            "line": 49,
+            "column": 31
+          }
+        },
+        "9": {
+          "start": {
+            "line": 51,
+            "column": 3
+          },
+          "end": {
+            "line": 51,
+            "column": 13
+          }
+        },
+        "10": {
+          "start": {
+            "line": 62,
+            "column": 2
+          },
+          "end": {
+            "line": 66,
+            "column": 3
+          }
+        },
+        "11": {
+          "start": {
+            "line": 63,
+            "column": 3
+          },
+          "end": {
+            "line": 63,
+            "column": 31
+          }
+        },
+        "12": {
+          "start": {
+            "line": 65,
+            "column": 3
+          },
+          "end": {
+            "line": 65,
+            "column": 13
+          }
+        },
+        "13": {
+          "start": {
+            "line": 76,
+            "column": 2
+          },
+          "end": {
+            "line": 80,
+            "column": 3
+          }
+        },
+        "14": {
+          "start": {
+            "line": 77,
+            "column": 3
+          },
+          "end": {
+            "line": 77,
+            "column": 31
+          }
+        },
+        "15": {
+          "start": {
+            "line": 79,
+            "column": 3
+          },
+          "end": {
+            "line": 79,
+            "column": 13
+          }
+        },
+        "16": {
+          "start": {
+            "line": 90,
+            "column": 2
+          },
+          "end": {
+            "line": 94,
+            "column": 3
+          }
+        },
+        "17": {
+          "start": {
+            "line": 91,
+            "column": 3
+          },
+          "end": {
+            "line": 91,
+            "column": 31
+          }
+        },
+        "18": {
+          "start": {
+            "line": 93,
+            "column": 3
+          },
+          "end": {
+            "line": 93,
+            "column": 13
+          }
+        }
+      },
+      "fnMap": {
+        "0": {
+          "name": "(anonymous_0)",
+          "decl": {
+            "start": {
+              "line": 9,
+              "column": 1
+            },
+            "end": {
+              "line": 9,
+              "column": 2
+            }
+          },
+          "loc": {
+            "start": {
+              "line": 9,
+              "column": 23
+            },
+            "end": {
+              "line": 11,
+              "column": 2
+            }
+          },
+          "line": 9
+        },
+        "1": {
+          "name": "(anonymous_1)",
+          "decl": {
+            "start": {
+              "line": 18,
+              "column": 1
+            },
+            "end": {
+              "line": 18,
+              "column": 2
+            }
+          },
+          "loc": {
+            "start": {
+              "line": 18,
+              "column": 21
+            },
+            "end": {
+              "line": 25,
+              "column": 2
+            }
+          },
+          "line": 18
+        },
+        "2": {
+          "name": "(anonymous_2)",
+          "decl": {
+            "start": {
+              "line": 32,
+              "column": 1
+            },
+            "end": {
+              "line": 32,
+              "column": 2
+            }
+          },
+          "loc": {
+            "start": {
+              "line": 32,
+              "column": 22
+            },
+            "end": {
+              "line": 39,
+              "column": 2
+            }
+          },
+          "line": 32
+        },
+        "3": {
+          "name": "(anonymous_3)",
+          "decl": {
+            "start": {
+              "line": 46,
+              "column": 1
+            },
+            "end": {
+              "line": 46,
+              "column": 2
+            }
+          },
+          "loc": {
+            "start": {
+              "line": 46,
+              "column": 22
+            },
+            "end": {
+              "line": 53,
+              "column": 2
+            }
+          },
+          "line": 46
+        },
+        "4": {
+          "name": "(anonymous_4)",
+          "decl": {
+            "start": {
+              "line": 60,
+              "column": 1
+            },
+            "end": {
+              "line": 60,
+              "column": 2
+            }
+          },
+          "loc": {
+            "start": {
+              "line": 60,
+              "column": 22
+            },
+            "end": {
+              "line": 67,
+              "column": 2
+            }
+          },
+          "line": 60
+        },
+        "5": {
+          "name": "(anonymous_5)",
+          "decl": {
+            "start": {
+              "line": 74,
+              "column": 1
+            },
+            "end": {
+              "line": 74,
+              "column": 2
+            }
+          },
+          "loc": {
+            "start": {
+              "line": 74,
+              "column": 22
+            },
+            "end": {
+              "line": 81,
+              "column": 2
+            }
+          },
+          "line": 74
+        },
+        "6": {
+          "name": "(anonymous_6)",
+          "decl": {
+            "start": {
+              "line": 88,
+              "column": 1
+            },
+            "end": {
+              "line": 88,
+              "column": 2
+            }
+          },
+          "loc": {
+            "start": {
+              "line": 88,
+              "column": 22
+            },
+            "end": {
+              "line": 95,
+              "column": 2
+            }
+          },
+          "line": 88
+        }
+      },
+      "branchMap": {
+        "0": {
+          "loc": {
+            "start": {
+              "line": 18,
+              "column": 9
+            },
+            "end": {
+              "line": 18,
+              "column": 18
+            }
+          },
+          "type": "default-arg",
+          "locations": [
+            {
+              "start": {
+                "line": 18,
+                "column": 17
+              },
+              "end": {
+                "line": 18,
+                "column": 18
+              }
+            }
+          ],
+          "line": 18
+        },
+        "1": {
+          "loc": {
+            "start": {
+              "line": 20,
+              "column": 2
+            },
+            "end": {
+              "line": 24,
+              "column": 3
+            }
+          },
+          "type": "if",
+          "locations": [
+            {
+              "start": {
+                "line": 20,
+                "column": 2
+              },
+              "end": {
+                "line": 24,
+                "column": 3
+              }
+            },
+            {
+              "start": {
+                "line": 20,
+                "column": 2
+              },
+              "end": {
+                "line": 24,
+                "column": 3
+              }
+            }
+          ],
+          "line": 20
+        },
+        "2": {
+          "loc": {
+            "start": {
+              "line": 32,
+              "column": 10
+            },
+            "end": {
+              "line": 32,
+              "column": 19
+            }
+          },
+          "type": "default-arg",
+          "locations": [
+            {
+              "start": {
+                "line": 32,
+                "column": 18
+              },
+              "end": {
+                "line": 32,
+                "column": 19
+              }
+            }
+          ],
+          "line": 32
+        },
+        "3": {
+          "loc": {
+            "start": {
+              "line": 34,
+              "column": 2
+            },
+            "end": {
+              "line": 38,
+              "column": 3
+            }
+          },
+          "type": "if",
+          "locations": [
+            {
+              "start": {
+                "line": 34,
+                "column": 2
+              },
+              "end": {
+                "line": 38,
+                "column": 3
+              }
+            },
+            {
+              "start": {
+                "line": 34,
+                "column": 2
+              },
+              "end": {
+                "line": 38,
+                "column": 3
+              }
+            }
+          ],
+          "line": 34
+        },
+        "4": {
+          "loc": {
+            "start": {
+              "line": 46,
+              "column": 10
+            },
+            "end": {
+              "line": 46,
+              "column": 19
+            }
+          },
+          "type": "default-arg",
+          "locations": [
+            {
+              "start": {
+                "line": 46,
+                "column": 18
+              },
+              "end": {
+                "line": 46,
+                "column": 19
+              }
+            }
+          ],
+          "line": 46
+        },
+        "5": {
+          "loc": {
+            "start": {
+              "line": 48,
+              "column": 2
+            },
+            "end": {
+              "line": 52,
+              "column": 3
+            }
+          },
+          "type": "if",
+          "locations": [
+            {
+              "start": {
+                "line": 48,
+                "column": 2
+              },
+              "end": {
+                "line": 52,
+                "column": 3
+              }
+            },
+            {
+              "start": {
+                "line": 48,
+                "column": 2
+              },
+              "end": {
+                "line": 52,
+                "column": 3
+              }
+            }
+          ],
+          "line": 48
+        },
+        "6": {
+          "loc": {
+            "start": {
+              "line": 60,
+              "column": 10
+            },
+            "end": {
+              "line": 60,
+              "column": 19
+            }
+          },
+          "type": "default-arg",
+          "locations": [
+            {
+              "start": {
+                "line": 60,
+                "column": 18
+              },
+              "end": {
+                "line": 60,
+                "column": 19
+              }
+            }
+          ],
+          "line": 60
+        },
+        "7": {
+          "loc": {
+            "start": {
+              "line": 62,
+              "column": 2
+            },
+            "end": {
+              "line": 66,
+              "column": 3
+            }
+          },
+          "type": "if",
+          "locations": [
+            {
+              "start": {
+                "line": 62,
+                "column": 2
+              },
+              "end": {
+                "line": 66,
+                "column": 3
+              }
+            },
+            {
+              "start": {
+                "line": 62,
+                "column": 2
+              },
+              "end": {
+                "line": 66,
+                "column": 3
+              }
+            }
+          ],
+          "line": 62
+        },
+        "8": {
+          "loc": {
+            "start": {
+              "line": 74,
+              "column": 10
+            },
+            "end": {
+              "line": 74,
+              "column": 19
+            }
+          },
+          "type": "default-arg",
+          "locations": [
+            {
+              "start": {
+                "line": 74,
+                "column": 18
+              },
+              "end": {
+                "line": 74,
+                "column": 19
+              }
+            }
+          ],
+          "line": 74
+        },
+        "9": {
+          "loc": {
+            "start": {
+              "line": 76,
+              "column": 2
+            },
+            "end": {
+              "line": 80,
+              "column": 3
+            }
+          },
+          "type": "if",
+          "locations": [
+            {
+              "start": {
+                "line": 76,
+                "column": 2
+              },
+              "end": {
+                "line": 80,
+                "column": 3
+              }
+            },
+            {
+              "start": {
+                "line": 76,
+                "column": 2
+              },
+              "end": {
+                "line": 80,
+                "column": 3
+              }
+            }
+          ],
+          "line": 76
+        },
+        "10": {
+          "loc": {
+            "start": {
+              "line": 88,
+              "column": 10
+            },
+            "end": {
+              "line": 88,
+              "column": 19
+            }
+          },
+          "type": "default-arg",
+          "locations": [
+            {
+              "start": {
+                "line": 88,
+                "column": 18
+              },
+              "end": {
+                "line": 88,
+                "column": 19
+              }
+            }
+          ],
+          "line": 88
+        },
+        "11": {
+          "loc": {
+            "start": {
+              "line": 90,
+              "column": 2
+            },
+            "end": {
+              "line": 94,
+              "column": 3
+            }
+          },
+          "type": "if",
+          "locations": [
+            {
+              "start": {
+                "line": 90,
+                "column": 2
+              },
+              "end": {
+                "line": 94,
+                "column": 3
+              }
+            },
+            {
+              "start": {
+                "line": 90,
+                "column": 2
+              },
+              "end": {
+                "line": 94,
+                "column": 3
+              }
+            }
+          ],
+          "line": 90
+        }
+      },
+      "s": {
+        "0": 17,
+        "1": 17,
+        "2": 4,
+        "3": 13,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 0,
+        "11": 0,
+        "12": 0,
+        "13": 0,
+        "14": 0,
+        "15": 0,
+        "16": 0,
+        "17": 0,
+        "18": 0
+      },
+      "f": {
+        "0": 17,
+        "1": 17,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0,
+        "6": 0
+      },
+      "b": {
+        "0": [
+          1
+        ],
+        "1": [
+          4,
+          13
+        ],
+        "2": [
+          0
+        ],
+        "3": [
+          0,
+          0
+        ],
+        "4": [
+          0
+        ],
+        "5": [
+          0,
+          0
+        ],
+        "6": [
+          0
+        ],
+        "7": [
+          0,
+          0
+        ],
+        "8": [
+          0
+        ],
+        "9": [
+          0,
+          0
+        ],
+        "10": [
+          0
+        ],
+        "11": [
+          0,
+          0
+        ]
+      },
+      "_coverageSchema": "332fd63041d2c1bcb487cc26dd0d5f7d97098a6c",
+      "hash": "bd6768bf69b42b68a56d611a401798767929c70b"
+    },
+    "/home/runner/work/unit-test-examples/unit-test-examples/src/js/ReactOracle.js": {
+      "path": "/home/runner/work/unit-test-examples/unit-test-examples/src/js/ReactOracle.js",
+      "statementMap": {
+        "0": {
+          "start": {
+            "line": 7,
+            "column": 22
+          },
+          "end": {
+            "line": 7,
+            "column": 32
+          }
+        },
+        "1": {
+          "start": {
+            "line": 9,
+            "column": 2
+          },
+          "end": {
+            "line": 15,
+            "column": 4
+          }
+        },
+        "2": {
+          "start": {
+            "line": 12,
+            "column": 5
+          },
+          "end": {
+            "line": 12,
+            "column": 47
+          }
+        }
+      },
+      "fnMap": {
+        "0": {
+          "name": "(anonymous_0)",
+          "decl": {
+            "start": {
+              "line": 6,
+              "column": 1
+            },
+            "end": {
+              "line": 6,
+              "column": 2
+            }
+          },
+          "loc": {
+            "start": {
+              "line": 6,
+              "column": 10
+            },
+            "end": {
+              "line": 16,
+              "column": 2
+            }
+          },
+          "line": 6
+        },
+        "1": {
+          "name": "(anonymous_1)",
+          "decl": {
+            "start": {
+              "line": 11,
+              "column": 19
+            },
+            "end": {
+              "line": 11,
+              "column": 20
+            }
+          },
+          "loc": {
+            "start": {
+              "line": 12,
+              "column": 5
+            },
+            "end": {
+              "line": 12,
+              "column": 47
+            }
+          },
+          "line": 12
+        }
+      },
+      "branchMap": {},
+      "s": {
+        "0": 1,
+        "1": 1,
+        "2": 2
+      },
+      "f": {
+        "0": 1,
+        "1": 2
+      },
+      "b": {},
+      "_coverageSchema": "332fd63041d2c1bcb487cc26dd0d5f7d97098a6c",
+      "hash": "b97581665bd41e169edbfb9928686f4b2e1d57d4"
+    },
+    "/home/runner/work/unit-test-examples/unit-test-examples/src/js/Oracle.js": {
+      "path": "/home/runner/work/unit-test-examples/unit-test-examples/src/js/Oracle.js",
+      "statementMap": {
+        "0": {
+          "start": {
+            "line": 10,
+            "column": 2
+          },
+          "end": {
+            "line": 10,
+            "column": 14
+          }
+        }
+      },
+      "fnMap": {
+        "0": {
+          "name": "(anonymous_0)",
+          "decl": {
+            "start": {
+              "line": 9,
+              "column": 1
+            },
+            "end": {
+              "line": 9,
+              "column": 2
+            }
+          },
+          "loc": {
+            "start": {
+              "line": 9,
+              "column": 10
+            },
+            "end": {
+              "line": 11,
+              "column": 2
+            }
+          },
+          "line": 9
+        }
+      },
+      "branchMap": {},
+      "s": {
+        "0": 1
+      },
+      "f": {
+        "0": 1
+      },
+      "b": {},
+      "_coverageSchema": "332fd63041d2c1bcb487cc26dd0d5f7d97098a6c",
+      "hash": "df2d5a71b758f8086632542548d4ea3c040e15cf"
+    },
+    "/home/runner/work/unit-test-examples/unit-test-examples/src/js/functions.js": {
+      "path": "/home/runner/work/unit-test-examples/unit-test-examples/src/js/functions.js",
+      "statementMap": {
+        "0": {
+          "start": {
+            "line": 6,
+            "column": 1
+          },
+          "end": {
+            "line": 6,
+            "column": 13
+          }
+        }
+      },
+      "fnMap": {
+        "0": {
+          "name": "getAnswer",
+          "decl": {
+            "start": {
+              "line": 5,
+              "column": 16
+            },
+            "end": {
+              "line": 5,
+              "column": 25
+            }
+          },
+          "loc": {
+            "start": {
+              "line": 5,
+              "column": 28
+            },
+            "end": {
+              "line": 7,
+              "column": 1
+            }
+          },
+          "line": 5
+        }
+      },
+      "branchMap": {},
+      "s": {
+        "0": 1
+      },
+      "f": {
+        "0": 1
+      },
+      "b": {},
+      "_coverageSchema": "332fd63041d2c1bcb487cc26dd0d5f7d97098a6c",
+      "hash": "321d0297e48e1f4ab98dd9721ff2a9374f19d432"
+    }
+  }
+}

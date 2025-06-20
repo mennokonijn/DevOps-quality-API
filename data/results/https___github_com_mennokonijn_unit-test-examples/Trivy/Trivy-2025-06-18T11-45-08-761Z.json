@@ -1,0 +1,750 @@
+{
+  "SchemaVersion": 2,
+  "CreatedAt": "2025-06-18T11:45:08.451617745Z",
+  "ArtifactName": ".",
+  "ArtifactType": "filesystem",
+  "Metadata": {
+    "ImageConfig": {
+      "architecture": "",
+      "created": "0001-01-01T00:00:00Z",
+      "os": "",
+      "rootfs": {
+        "type": "",
+        "diff_ids": null
+      },
+      "config": {}
+    }
+  },
+  "Results": [
+    {
+      "Target": "package-lock.json",
+      "Class": "lang-pkgs",
+      "Type": "npm",
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2022-0235",
+          "PkgID": "node-fetch@1.7.3",
+          "PkgName": "node-fetch",
+          "PkgIdentifier": {
+            "PURL": "pkg:npm/node-fetch@1.7.3",
+            "UID": "759947aaa88b00ae"
+          },
+          "InstalledVersion": "1.7.3",
+          "FixedVersion": "3.1.1, 2.6.7",
+          "Status": "fixed",
+          "Layer": {},
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2022-0235",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory npm",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm"
+          },
+          "Title": "node-fetch: exposure of sensitive information to an unauthorized actor",
+          "Description": "node-fetch is vulnerable to Exposure of Sensitive Information to an Unauthorized Actor",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-200",
+            "CWE-601"
+          ],
+          "VendorSeverity": {
+            "alma": 2,
+            "ghsa": 3,
+            "nvd": 2,
+            "oracle-oval": 2,
+            "redhat": 2,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.0/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H",
+              "V3Score": 8.8
+            },
+            "nvd": {
+              "V2Vector": "AV:N/AC:M/Au:N/C:P/I:P/A:N",
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N",
+              "V2Score": 5.8,
+              "V3Score": 6.1
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:C/C:H/I:N/A:N",
+              "V3Score": 6.1
+            }
+          },
+          "References": [
+            "https://access.redhat.com/errata/RHSA-2023:0050",
+            "https://access.redhat.com/security/cve/CVE-2022-0235",
+            "https://bugzilla.redhat.com/2044591",
+            "https://bugzilla.redhat.com/2066009",
+            "https://bugzilla.redhat.com/2134609",
+            "https://bugzilla.redhat.com/2140911",
+            "https://bugzilla.redhat.com/2150323",
+            "https://cert-portal.siemens.com/productcert/pdf/ssa-637483.pdf",
+            "https://errata.almalinux.org/8/ALSA-2023-0050.html",
+            "https://github.com/node-fetch/node-fetch",
+            "https://github.com/node-fetch/node-fetch/commit/1ef4b560a17e644a02a3bfdea7631ffeee578b35",
+            "https://github.com/node-fetch/node-fetch/commit/36e47e8a6406185921e4985dcbeff140d73eaa10",
+            "https://github.com/node-fetch/node-fetch/commit/5c32f002fdd65b1c6a8f1e3620210813d45c7e60",
+            "https://github.com/node-fetch/node-fetch/pull/1449/commits/5c32f002fdd65b1c6a8f1e3620210813d45c7e60",
+            "https://github.com/node-fetch/node-fetch/pull/1453",
+            "https://huntr.dev/bounties/d26ab655-38d6-48b3-be15-f9ad6b6ae6f7",
+            "https://huntr.dev/bounties/d26ab655-38d6-48b3-be15-f9ad6b6ae6f7/",
+            "https://linux.oracle.com/cve/CVE-2022-0235.html",
+            "https://linux.oracle.com/errata/ELSA-2023-0050.html",
+            "https://lists.debian.org/debian-lts-announce/2022/12/msg00007.html",
+            "https://nvd.nist.gov/vuln/detail/CVE-2022-0235",
+            "https://ubuntu.com/security/notices/USN-6158-1",
+            "https://www.cve.org/CVERecord?id=CVE-2022-0235"
+          ],
+          "PublishedDate": "2022-01-16T17:15:07.87Z",
+          "LastModifiedDate": "2024-11-21T06:38:12.15Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2018-6341",
+          "PkgID": "react-dom@16.3.1",
+          "PkgName": "react-dom",
+          "PkgIdentifier": {
+            "PURL": "pkg:npm/react-dom@16.3.1",
+            "UID": "2dcdb5a78075186b"
+          },
+          "InstalledVersion": "16.3.1",
+          "FixedVersion": "16.0.1, 16.1.2, 16.2.1, 16.3.3, 16.4.2",
+          "Status": "fixed",
+          "Layer": {},
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2018-6341",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory npm",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm"
+          },
+          "Title": "Cross-Site Scripting in react-dom",
+          "Description": "React applications which rendered to HTML using the ReactDOMServer API were not escaping user-supplied attribute names at render-time. That lack of escaping could lead to a cross-site scripting vulnerability. This issue affected minor releases 16.0.x, 16.1.x, 16.2.x, 16.3.x, and 16.4.x. It was fixed in 16.0.1, 16.1.2, 16.2.1, 16.3.3, and 16.4.2.",
+          "Severity": "MEDIUM",
+          "CweIDs": [
+            "CWE-79"
+          ],
+          "VendorSeverity": {
+            "ghsa": 2,
+            "nvd": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N",
+              "V3Score": 6.1
+            },
+            "nvd": {
+              "V2Vector": "AV:N/AC:M/Au:N/C:N/I:P/A:N",
+              "V3Vector": "CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N",
+              "V2Score": 4.3,
+              "V3Score": 6.1
+            }
+          },
+          "References": [
+            "https://github.com/advisories/GHSA-mvjj-gqq2-p4hw",
+            "https://nvd.nist.gov/vuln/detail/CVE-2018-6341",
+            "https://reactjs.org/blog/2018/08/01/react-v-16-4-2.html",
+            "https://snyk.io/vuln/npm:react-dom:20180802",
+            "https://twitter.com/reactjs/status/1024745321987887104",
+            "https://www.npmjs.com/advisories/1421"
+          ],
+          "PublishedDate": "2018-12-31T22:29:00.387Z",
+          "LastModifiedDate": "2025-05-06T17:15:51.207Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2020-7733",
+          "PkgID": "ua-parser-js@0.7.17",
+          "PkgName": "ua-parser-js",
+          "PkgIdentifier": {
+            "PURL": "pkg:npm/ua-parser-js@0.7.17",
+            "UID": "7b1f0dc3429922c1"
+          },
+          "InstalledVersion": "0.7.17",
+          "FixedVersion": "0.7.22",
+          "Status": "fixed",
+          "Layer": {},
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2020-7733",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory npm",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm"
+          },
+          "Title": "nodejs-ua-parser-js: Regular expression denial of service via the regex",
+          "Description": "The package ua-parser-js before 0.7.22 are vulnerable to Regular Expression Denial of Service (ReDoS) via the regex for Redmi Phones and Mi Pad Tablets UA.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-400"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "nvd": 3,
+            "redhat": 1
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "nvd": {
+              "V2Vector": "AV:N/AC:L/Au:N/C:N/I:N/A:P",
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V2Score": 5,
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2020-7733",
+            "https://github.com/faisalman/ua-parser-js/commit/233d3bae22a795153a7e6638887ce159c63e557d",
+            "https://nvd.nist.gov/vuln/detail/CVE-2020-7733",
+            "https://snyk.io/vuln/SNYK-JAVA-ORGWEBJARSBOWERGITHUBFAISALMAN-674666",
+            "https://snyk.io/vuln/SNYK-JAVA-ORGWEBJARSNPM-674665",
+            "https://snyk.io/vuln/SNYK-JS-UAPARSERJS-610226",
+            "https://www.cve.org/CVERecord?id=CVE-2020-7733",
+            "https://www.oracle.com//security-alerts/cpujul2021.html"
+          ],
+          "PublishedDate": "2020-09-16T14:15:15.033Z",
+          "LastModifiedDate": "2024-11-21T05:37:41.963Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2020-7793",
+          "PkgID": "ua-parser-js@0.7.17",
+          "PkgName": "ua-parser-js",
+          "PkgIdentifier": {
+            "PURL": "pkg:npm/ua-parser-js@0.7.17",
+            "UID": "7b1f0dc3429922c1"
+          },
+          "InstalledVersion": "0.7.17",
+          "FixedVersion": "0.7.23",
+          "Status": "fixed",
+          "Layer": {},
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2020-7793",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory npm",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm"
+          },
+          "Title": "nodejs-ua-parser-js: ReDoS in multiple regexes",
+          "Description": "The package ua-parser-js before 0.7.23 are vulnerable to Regular Expression Denial of Service (ReDoS) in multiple regexes (see linked commit for more info).",
+          "Severity": "HIGH",
+          "VendorSeverity": {
+            "ghsa": 3,
+            "nvd": 3,
+            "redhat": 1,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "nvd": {
+              "V2Vector": "AV:N/AC:L/Au:N/C:N/I:N/A:P",
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V2Score": 5,
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2020-7793",
+            "https://cert-portal.siemens.com/productcert/pdf/ssa-637483.pdf",
+            "https://github.com/faisalman/ua-parser-js/commit/6d1f26df051ba681463ef109d36c9cf0f7e32b18",
+            "https://github.com/faisalman/ua-parser-js/commit/6d1f26df051ba681463ef109d36c9cf0f7e32b18 (0.7.23)",
+            "https://nvd.nist.gov/vuln/detail/CVE-2020-7793",
+            "https://snyk.io/vuln/SNYK-JAVA-ORGWEBJARSBOWERGITHUBFAISALMAN-1050388",
+            "https://snyk.io/vuln/SNYK-JAVA-ORGWEBJARSNPM-1050387",
+            "https://snyk.io/vuln/SNYK-JS-UAPARSERJS-1023599",
+            "https://www.cve.org/CVERecord?id=CVE-2020-7793"
+          ],
+          "PublishedDate": "2020-12-11T14:15:11.283Z",
+          "LastModifiedDate": "2024-11-21T05:37:48.89Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2021-27292",
+          "PkgID": "ua-parser-js@0.7.17",
+          "PkgName": "ua-parser-js",
+          "PkgIdentifier": {
+            "PURL": "pkg:npm/ua-parser-js@0.7.17",
+            "UID": "7b1f0dc3429922c1"
+          },
+          "InstalledVersion": "0.7.17",
+          "FixedVersion": "0.7.24",
+          "Status": "fixed",
+          "Layer": {},
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2021-27292",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory npm",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm"
+          },
+          "Title": "nodejs-ua-parser-js: ReDoS via malicious User-Agent header",
+          "Description": "ua-parser-js >= 0.7.14, fixed in 0.7.24, uses a regular expression which is vulnerable to denial of service. If an attacker sends a malicious User-Agent header, ua-parser-js will get stuck processing it for an extended period of time.",
+          "Severity": "HIGH",
+          "VendorSeverity": {
+            "ghsa": 3,
+            "nvd": 3,
+            "redhat": 2,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "nvd": {
+              "V2Vector": "AV:N/AC:L/Au:N/C:N/I:N/A:P",
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V2Score": 5,
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2021-27292",
+            "https://gist.github.com/b-c-ds/6941d80d6b4e694df4bc269493b7be76",
+            "https://github.com/faisalman/ua-parser-js/commit/809439e20e273ce0d25c1d04e111dcf6011eb566",
+            "https://github.com/pygments/pygments/commit/2e7e8c4a7b318f4032493773732754e418279a14",
+            "https://nvd.nist.gov/vuln/detail/CVE-2021-27292",
+            "https://www.cve.org/CVERecord?id=CVE-2021-27292"
+          ],
+          "PublishedDate": "2021-03-17T13:15:15.2Z",
+          "LastModifiedDate": "2024-11-21T05:57:45.83Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2022-25927",
+          "PkgID": "ua-parser-js@0.7.17",
+          "PkgName": "ua-parser-js",
+          "PkgIdentifier": {
+            "PURL": "pkg:npm/ua-parser-js@0.7.17",
+            "UID": "7b1f0dc3429922c1"
+          },
+          "InstalledVersion": "0.7.17",
+          "FixedVersion": "0.7.33, 1.0.33",
+          "Status": "fixed",
+          "Layer": {},
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2022-25927",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory npm",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm"
+          },
+          "Title": "ua-parser-js: ReDoS vulnerability via the trim() function",
+          "Description": "Versions of the package ua-parser-js from 0.7.30 and before 0.7.33, from 0.8.1 and before 1.0.33 are vulnerable to Regular Expression Denial of Service (ReDoS) via the trim() function.\r\r",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-1333"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "nvd": 3,
+            "redhat": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2022-25927",
+            "https://github.com/faisalman/ua-parser-js",
+            "https://github.com/faisalman/ua-parser-js/commit/a6140a17dd0300a35cfc9cff999545f267889411",
+            "https://github.com/faisalman/ua-parser-js/security/advisories/GHSA-fhg7-m89q-25r3",
+            "https://nvd.nist.gov/vuln/detail/CVE-2022-25927",
+            "https://security.snyk.io/vuln/SNYK-JS-UAPARSERJS-3244450",
+            "https://www.cve.org/CVERecord?id=CVE-2022-25927"
+          ],
+          "PublishedDate": "2023-01-26T21:15:32.107Z",
+          "LastModifiedDate": "2025-04-01T19:15:41.557Z"
+        }
+      ]
+    },
+    {
+      "Target": "yarn.lock",
+      "Class": "lang-pkgs",
+      "Type": "yarn",
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2022-0235",
+          "PkgID": "node-fetch@1.7.3",
+          "PkgName": "node-fetch",
+          "PkgIdentifier": {
+            "PURL": "pkg:npm/node-fetch@1.7.3",
+            "UID": "652fcdbd3579e259"
+          },
+          "InstalledVersion": "1.7.3",
+          "FixedVersion": "3.1.1, 2.6.7",
+          "Status": "fixed",
+          "Layer": {},
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2022-0235",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory npm",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm"
+          },
+          "Title": "node-fetch: exposure of sensitive information to an unauthorized actor",
+          "Description": "node-fetch is vulnerable to Exposure of Sensitive Information to an Unauthorized Actor",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-200",
+            "CWE-601"
+          ],
+          "VendorSeverity": {
+            "alma": 2,
+            "ghsa": 3,
+            "nvd": 2,
+            "oracle-oval": 2,
+            "redhat": 2,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.0/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H",
+              "V3Score": 8.8
+            },
+            "nvd": {
+              "V2Vector": "AV:N/AC:M/Au:N/C:P/I:P/A:N",
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N",
+              "V2Score": 5.8,
+              "V3Score": 6.1
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:C/C:H/I:N/A:N",
+              "V3Score": 6.1
+            }
+          },
+          "References": [
+            "https://access.redhat.com/errata/RHSA-2023:0050",
+            "https://access.redhat.com/security/cve/CVE-2022-0235",
+            "https://bugzilla.redhat.com/2044591",
+            "https://bugzilla.redhat.com/2066009",
+            "https://bugzilla.redhat.com/2134609",
+            "https://bugzilla.redhat.com/2140911",
+            "https://bugzilla.redhat.com/2150323",
+            "https://cert-portal.siemens.com/productcert/pdf/ssa-637483.pdf",
+            "https://errata.almalinux.org/8/ALSA-2023-0050.html",
+            "https://github.com/node-fetch/node-fetch",
+            "https://github.com/node-fetch/node-fetch/commit/1ef4b560a17e644a02a3bfdea7631ffeee578b35",
+            "https://github.com/node-fetch/node-fetch/commit/36e47e8a6406185921e4985dcbeff140d73eaa10",
+            "https://github.com/node-fetch/node-fetch/commit/5c32f002fdd65b1c6a8f1e3620210813d45c7e60",
+            "https://github.com/node-fetch/node-fetch/pull/1449/commits/5c32f002fdd65b1c6a8f1e3620210813d45c7e60",
+            "https://github.com/node-fetch/node-fetch/pull/1453",
+            "https://huntr.dev/bounties/d26ab655-38d6-48b3-be15-f9ad6b6ae6f7",
+            "https://huntr.dev/bounties/d26ab655-38d6-48b3-be15-f9ad6b6ae6f7/",
+            "https://linux.oracle.com/cve/CVE-2022-0235.html",
+            "https://linux.oracle.com/errata/ELSA-2023-0050.html",
+            "https://lists.debian.org/debian-lts-announce/2022/12/msg00007.html",
+            "https://nvd.nist.gov/vuln/detail/CVE-2022-0235",
+            "https://ubuntu.com/security/notices/USN-6158-1",
+            "https://www.cve.org/CVERecord?id=CVE-2022-0235"
+          ],
+          "PublishedDate": "2022-01-16T17:15:07.87Z",
+          "LastModifiedDate": "2024-11-21T06:38:12.15Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2018-6341",
+          "PkgID": "react-dom@16.3.1",
+          "PkgName": "react-dom",
+          "PkgIdentifier": {
+            "PURL": "pkg:npm/react-dom@16.3.1",
+            "UID": "2ff13962d77400cc"
+          },
+          "InstalledVersion": "16.3.1",
+          "FixedVersion": "16.0.1, 16.1.2, 16.2.1, 16.3.3, 16.4.2",
+          "Status": "fixed",
+          "Layer": {},
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2018-6341",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory npm",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm"
+          },
+          "Title": "Cross-Site Scripting in react-dom",
+          "Description": "React applications which rendered to HTML using the ReactDOMServer API were not escaping user-supplied attribute names at render-time. That lack of escaping could lead to a cross-site scripting vulnerability. This issue affected minor releases 16.0.x, 16.1.x, 16.2.x, 16.3.x, and 16.4.x. It was fixed in 16.0.1, 16.1.2, 16.2.1, 16.3.3, and 16.4.2.",
+          "Severity": "MEDIUM",
+          "CweIDs": [
+            "CWE-79"
+          ],
+          "VendorSeverity": {
+            "ghsa": 2,
+            "nvd": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N",
+              "V3Score": 6.1
+            },
+            "nvd": {
+              "V2Vector": "AV:N/AC:M/Au:N/C:N/I:P/A:N",
+              "V3Vector": "CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N",
+              "V2Score": 4.3,
+              "V3Score": 6.1
+            }
+          },
+          "References": [
+            "https://github.com/advisories/GHSA-mvjj-gqq2-p4hw",
+            "https://nvd.nist.gov/vuln/detail/CVE-2018-6341",
+            "https://reactjs.org/blog/2018/08/01/react-v-16-4-2.html",
+            "https://snyk.io/vuln/npm:react-dom:20180802",
+            "https://twitter.com/reactjs/status/1024745321987887104",
+            "https://www.npmjs.com/advisories/1421"
+          ],
+          "PublishedDate": "2018-12-31T22:29:00.387Z",
+          "LastModifiedDate": "2025-05-06T17:15:51.207Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2020-7733",
+          "PkgID": "ua-parser-js@0.7.17",
+          "PkgName": "ua-parser-js",
+          "PkgIdentifier": {
+            "PURL": "pkg:npm/ua-parser-js@0.7.17",
+            "UID": "f93cd2e07ad7c83b"
+          },
+          "InstalledVersion": "0.7.17",
+          "FixedVersion": "0.7.22",
+          "Status": "fixed",
+          "Layer": {},
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2020-7733",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory npm",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm"
+          },
+          "Title": "nodejs-ua-parser-js: Regular expression denial of service via the regex",
+          "Description": "The package ua-parser-js before 0.7.22 are vulnerable to Regular Expression Denial of Service (ReDoS) via the regex for Redmi Phones and Mi Pad Tablets UA.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-400"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "nvd": 3,
+            "redhat": 1
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "nvd": {
+              "V2Vector": "AV:N/AC:L/Au:N/C:N/I:N/A:P",
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V2Score": 5,
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2020-7733",
+            "https://github.com/faisalman/ua-parser-js/commit/233d3bae22a795153a7e6638887ce159c63e557d",
+            "https://nvd.nist.gov/vuln/detail/CVE-2020-7733",
+            "https://snyk.io/vuln/SNYK-JAVA-ORGWEBJARSBOWERGITHUBFAISALMAN-674666",
+            "https://snyk.io/vuln/SNYK-JAVA-ORGWEBJARSNPM-674665",
+            "https://snyk.io/vuln/SNYK-JS-UAPARSERJS-610226",
+            "https://www.cve.org/CVERecord?id=CVE-2020-7733",
+            "https://www.oracle.com//security-alerts/cpujul2021.html"
+          ],
+          "PublishedDate": "2020-09-16T14:15:15.033Z",
+          "LastModifiedDate": "2024-11-21T05:37:41.963Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2020-7793",
+          "PkgID": "ua-parser-js@0.7.17",
+          "PkgName": "ua-parser-js",
+          "PkgIdentifier": {
+            "PURL": "pkg:npm/ua-parser-js@0.7.17",
+            "UID": "f93cd2e07ad7c83b"
+          },
+          "InstalledVersion": "0.7.17",
+          "FixedVersion": "0.7.23",
+          "Status": "fixed",
+          "Layer": {},
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2020-7793",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory npm",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm"
+          },
+          "Title": "nodejs-ua-parser-js: ReDoS in multiple regexes",
+          "Description": "The package ua-parser-js before 0.7.23 are vulnerable to Regular Expression Denial of Service (ReDoS) in multiple regexes (see linked commit for more info).",
+          "Severity": "HIGH",
+          "VendorSeverity": {
+            "ghsa": 3,
+            "nvd": 3,
+            "redhat": 1,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "nvd": {
+              "V2Vector": "AV:N/AC:L/Au:N/C:N/I:N/A:P",
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V2Score": 5,
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2020-7793",
+            "https://cert-portal.siemens.com/productcert/pdf/ssa-637483.pdf",
+            "https://github.com/faisalman/ua-parser-js/commit/6d1f26df051ba681463ef109d36c9cf0f7e32b18",
+            "https://github.com/faisalman/ua-parser-js/commit/6d1f26df051ba681463ef109d36c9cf0f7e32b18 (0.7.23)",
+            "https://nvd.nist.gov/vuln/detail/CVE-2020-7793",
+            "https://snyk.io/vuln/SNYK-JAVA-ORGWEBJARSBOWERGITHUBFAISALMAN-1050388",
+            "https://snyk.io/vuln/SNYK-JAVA-ORGWEBJARSNPM-1050387",
+            "https://snyk.io/vuln/SNYK-JS-UAPARSERJS-1023599",
+            "https://www.cve.org/CVERecord?id=CVE-2020-7793"
+          ],
+          "PublishedDate": "2020-12-11T14:15:11.283Z",
+          "LastModifiedDate": "2024-11-21T05:37:48.89Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2021-27292",
+          "PkgID": "ua-parser-js@0.7.17",
+          "PkgName": "ua-parser-js",
+          "PkgIdentifier": {
+            "PURL": "pkg:npm/ua-parser-js@0.7.17",
+            "UID": "f93cd2e07ad7c83b"
+          },
+          "InstalledVersion": "0.7.17",
+          "FixedVersion": "0.7.24",
+          "Status": "fixed",
+          "Layer": {},
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2021-27292",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory npm",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm"
+          },
+          "Title": "nodejs-ua-parser-js: ReDoS via malicious User-Agent header",
+          "Description": "ua-parser-js >= 0.7.14, fixed in 0.7.24, uses a regular expression which is vulnerable to denial of service. If an attacker sends a malicious User-Agent header, ua-parser-js will get stuck processing it for an extended period of time.",
+          "Severity": "HIGH",
+          "VendorSeverity": {
+            "ghsa": 3,
+            "nvd": 3,
+            "redhat": 2,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "nvd": {
+              "V2Vector": "AV:N/AC:L/Au:N/C:N/I:N/A:P",
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V2Score": 5,
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2021-27292",
+            "https://gist.github.com/b-c-ds/6941d80d6b4e694df4bc269493b7be76",
+            "https://github.com/faisalman/ua-parser-js/commit/809439e20e273ce0d25c1d04e111dcf6011eb566",
+            "https://github.com/pygments/pygments/commit/2e7e8c4a7b318f4032493773732754e418279a14",
+            "https://nvd.nist.gov/vuln/detail/CVE-2021-27292",
+            "https://www.cve.org/CVERecord?id=CVE-2021-27292"
+          ],
+          "PublishedDate": "2021-03-17T13:15:15.2Z",
+          "LastModifiedDate": "2024-11-21T05:57:45.83Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2022-25927",
+          "PkgID": "ua-parser-js@0.7.17",
+          "PkgName": "ua-parser-js",
+          "PkgIdentifier": {
+            "PURL": "pkg:npm/ua-parser-js@0.7.17",
+            "UID": "f93cd2e07ad7c83b"
+          },
+          "InstalledVersion": "0.7.17",
+          "FixedVersion": "0.7.33, 1.0.33",
+          "Status": "fixed",
+          "Layer": {},
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2022-25927",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory npm",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm"
+          },
+          "Title": "ua-parser-js: ReDoS vulnerability via the trim() function",
+          "Description": "Versions of the package ua-parser-js from 0.7.30 and before 0.7.33, from 0.8.1 and before 1.0.33 are vulnerable to Regular Expression Denial of Service (ReDoS) via the trim() function.\r\r",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-1333"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "nvd": 3,
+            "redhat": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2022-25927",
+            "https://github.com/faisalman/ua-parser-js",
+            "https://github.com/faisalman/ua-parser-js/commit/a6140a17dd0300a35cfc9cff999545f267889411",
+            "https://github.com/faisalman/ua-parser-js/security/advisories/GHSA-fhg7-m89q-25r3",
+            "https://nvd.nist.gov/vuln/detail/CVE-2022-25927",
+            "https://security.snyk.io/vuln/SNYK-JS-UAPARSERJS-3244450",
+            "https://www.cve.org/CVERecord?id=CVE-2022-25927"
+          ],
+          "PublishedDate": "2023-01-26T21:15:32.107Z",
+          "LastModifiedDate": "2025-04-01T19:15:41.557Z"
+        }
+      ]
+    }
+  ]
+}

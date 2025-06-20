@@ -1,6 +1,7 @@
 import express from 'express';
 import fs from 'fs';
 import path from 'path';
+import {dummyMetricData} from "../test";
 
 const router = express.Router();
 const BASE_RESULTS_DIR = path.join(__dirname, '../../data/results');
@@ -12,7 +13,9 @@ if (!fs.existsSync(BASE_RESULTS_DIR)) {
 
 router.post('/metrics', express.json(), (req, res) => {
     const tool = req.headers['x-tool-name'] as string || 'unknown';
-    const repo = req.headers['x-repo-name'] as string || 'unknown-repo';
+    const rawRepo = req.headers['x-repo-name'] as string || 'unknown-repo';
+    const repo = rawRepo.replace(/[^\w\-]/g, '_');
+
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const filename = `${tool}-${timestamp}.json`;
 
@@ -30,8 +33,8 @@ router.post('/metrics', express.json(), (req, res) => {
     }
 });
 
-router.post('/extract-results', express.json(), (req, res) => {
-
+router.get('/extract-results', (req, res) => {
+    res.json(dummyMetricData);
 });
 
 export default router;
