@@ -1,3 +1,5 @@
+import { NGROK_URL } from "../config/env";
+
 export type MetricToolStep = {
     name: string;
     command: string | {
@@ -12,8 +14,7 @@ export type MetricToolMap = Record<string, {
     steps: MetricToolStep[];
 }>;
 
-// Make fixed when deployed
-const ngrokUrl = 'https://e101-144-178-66-36.ngrok-free.app';
+const ngrokUrl = NGROK_URL;
 
 const SONARQUBE_METRIC_KEYS: Record<string, string> = {
     "Code Smells": "code_smells",
@@ -179,6 +180,7 @@ export function generateGitHubActionsYaml(
     workingDir = '.',
     branch = 'master'
 ): string {
+    console.log(ngrokUrl)
     const allSteps: MetricToolStep[] = [];
     const allTools = new Set<string>();
     const NGROK_URL = ngrokUrl;
