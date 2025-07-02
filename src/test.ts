@@ -1,27 +1,32 @@
-const dummyMetrics: { [key: string]: { name: string; value: string | number }[] } = {
-    Planning: [
-        { name: 'Requirements Volatility', value: 'Low' },
-        { name: 'Requirements Completeness', value: '85%' }
+export const dummyMetricData: Record<string, { name: string; value: string }[]> = {
+    Plan: [
+        { name: 'Requirements Volatility', value: 'JIRA API' },
+        { name: 'Requirements Completeness', value: 'Stakeholder survey' },
     ],
-    Coding: [
-        { name: 'Cyclomatic Complexity', value: 12 },
-        { name: 'Cognitive Complexity', value: 9 },
-        { name: 'Code Smells', value: 5 },
-        { name: 'Duplicated Lines Density', value: '2.4%' },
-        { name: 'Programming Language Impact', value: '300 DRAM' }
+    Code: [
+        { name: 'Cyclomatic Complexity', value: 'SonarQube' },
+        { name: 'Cognitive Complexity', value: 'SonarQube' },
+        { name: 'Code Smells', value: 'SonarQube' },
+        { name: 'Duplicated Lines Density', value: 'SonarQube' },
+        { name: 'CVE identifiers and CVSS scores', value: 'Trivy' },
+        { name: 'Programming Language Impact', value: 'GitHub Linguist, Marco Couto benchmark' },
     ],
-    Testing: [
-        { name: 'Total Coverage', value: '87%' },
-        { name: 'Test Success Density', value: '91%' }
+    Build: [
+        { name: 'Unused Libraries', value: 'Depcheck/Vulture/Maven Analyzer' },
     ],
-    Deploying: [
-        { name: 'Change Failure Rate', value: '3%' },
-        { name: 'Mean Time to Recover', value: '15m' }
+    Test: [
+        { name: 'Total Coverage', value: 'SonarQube' },
+        { name: 'Test Success Density', value: 'Jest' },
     ],
-    Maintaining: [
-        { name: 'Defect Density', value: 0.02 },
-        { name: 'Customer Satisfaction', value: '4.5/5' },
-        { name: 'Unused Libraries', value: 2 },
-        { name: 'Runtime Performance', value: '98%' }
-    ]
+    'Deploy/Release': [
+        { name: 'Change Failure Rate (CFR)', value: 'GitHub Actions' },
+        { name: 'Secret Detection', value: 'SonarQube' },
+        { name: 'Mean Time to Restore (MTTR)', value: 'GitHub REST API' },
+    ],
+    Operate: [
+        { name: 'Customer Satisfaction', value: 'Survey' },
+    ],
+    Monitor: [
+        { name: 'Defect Density', value: 'JIRA (Bug-labeled issues)' },
+    ],
 };

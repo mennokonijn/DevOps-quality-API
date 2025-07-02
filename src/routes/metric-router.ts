@@ -1,35 +1,51 @@
 import express from 'express';
 import fs from 'fs';
 import path from 'path';
+import {saveMetrics} from "../helpers/saveMetrics";
+import {extractResults} from "../helpers/extractResults";
 
 const router = express.Router();
+const BASE_RESULTS_DIR = path.join(__dirname, '../../data/results');
 
-// This folder will store the posted metric results
-const RESULTS_DIR = path.join(__dirname, '../../data/results');
+const TOOLS = ['GitLeaks', 'Jest', 'SonarQube', 'Trivy'];
 
-// Ensure the directory exists
-if (!fs.existsSync(RESULTS_DIR)) {
-    fs.mkdirSync(RESULTS_DIR, { recursive: true });
+if (!fs.existsSync(BASE_RESULTS_DIR)) {
+    fs.mkdirSync(BASE_RESULTS_DIR, { recursive: true });
 }
 
-router.post('/metrics', (req, res) => {
-    const { repo, commit, tool, rawTextOutput } = req.body;
 
-    if (!repo || !commit || !tool || !rawTextOutput) {
-        return res.status(400).json({ error: 'Missing required fields' });
-    }
+router.post('/metrics', express.json(), async (req, res) => {
+    const tool = req.headers['x-tool-name'] as string || 'unknown';
+    const rawRepoUrl = req.headers['x-repo-name'] as string || 'unknown/unknown-repo';
 
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const filename = `${repo.replace(/\//g, '_')}--${tool}--${commit}--${timestamp}.json`;
-    const filePath = path.join(RESULTS_DIR, filename);
+    const repoMatch = rawRepoUrl.match(/github\.com[:/](.+?\/.+?)(?:\.git)?$/);
+    const repo = repoMatch ? repoMatch[1] : rawRepoUrl;
+
 
     try {
-        fs.writeFileSync(filePath, JSON.stringify({ repo, commit, tool, rawTextOutput }, null, 2));
-        console.log(`✅ Saved results for ${tool} from ${repo}@${commit}`);
-        res.status(200).json({ status: 'ok' });
+        await saveMetrics(repo, tool, req);
+        res.status(200).json({ message: `Metrics saved for tool "${tool}"` });
     } catch (err) {
-        console.error('❌ Failed to save results:', err);
-        res.status(500).json({ error: 'Failed to save results' });
+        console.error('❌ Failed to save metrics:', err);
+        res.status(500).json({ error: 'Failed to save metrics' });
+    }
+});
+
+router.get('/extract-results', async (req, res) => {
+    const repoName = req.query.repo as string;
+
+
+    if (!repoName) {
+        return res.status(400).json({ error: 'Missing repo query param' });
+    }
+
+    try {
+        const results = await extractResults(repoName);
+
+        return res.json(results);
+    } catch (err) {
+        console.error('Failed to extract metrics:', err);
+        res.status(500).json({ error: 'Failed to extract metrics' });
     }
 });
 

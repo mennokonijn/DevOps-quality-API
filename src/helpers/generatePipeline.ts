@@ -1,3 +1,5 @@
+import { NGROK_URL } from "../config/env";
+
 export type MetricToolStep = {
     name: string;
     command: string | {
@@ -11,6 +13,16 @@ export type MetricToolMap = Record<string, {
     tools: string[];
     steps: MetricToolStep[];
 }>;
+
+const ngrokUrl = NGROK_URL;
+
+const SONARQUBE_METRIC_KEYS: Record<string, string> = {
+    "Code Smells": "code_smells",
+    "Cyclomatic Complexity": "complexity",
+    "Cognitive Complexity": "cognitive_complexity",
+    "Duplicated Lines Density": "duplicated_lines_density",
+    "Total Coverage": "coverage"
+};
 
 export const METRIC_MAP: Record<string, Record<string, MetricToolMap[string]>> = {
     javascript: {
@@ -56,7 +68,22 @@ export const METRIC_MAP: Record<string, Record<string, MetricToolMap[string]>> =
             steps: [
                 {
                     name: "Run GitLeaks",
-                    command: "gitleaks detect --source=. --report-format json --report-path=gitleaks.json --no-git",
+                    command: `
+echo "[allowlist]
+description = \\"Exclude common non-source directories\\"
+paths = [
+  '''\\\\.cache/''',
+  '''node_modules/''',
+  '''dist/'''
+]" > .gitleaks.toml
+
+gitleaks detect \\
+  --source=. \\
+  --config=.gitleaks.toml \\
+  --report-format json \\
+  --report-path=gitleaks.json \\
+  --no-git
+            `.trim(),
                     continueOnError: true
                 }
             ]
@@ -114,7 +141,22 @@ export const METRIC_MAP: Record<string, Record<string, MetricToolMap[string]>> =
             steps: [
                 {
                     name: "Run GitLeaks",
-                    command: "gitleaks detect --source=. --report-format json --report-path=gitleaks.json --no-git",
+                    command: `
+echo "[allowlist]
+description = \\"Exclude common non-source directories\\"
+paths = [
+  '''\\\\.cache/''',
+  '''node_modules/''',
+  '''dist/'''
+]" > .gitleaks.toml
+
+gitleaks detect \\
+  --source=. \\
+  --config=.gitleaks.toml \\
+  --report-format json \\
+  --report-path=gitleaks.json \\
+  --no-git
+            `.trim(),
                     continueOnError: true
                 }
             ]
@@ -138,14 +180,55 @@ export function generateGitHubActionsYaml(
     workingDir = '.',
     branch = 'master'
 ): string {
+    console.log(ngrokUrl)
     const allSteps: MetricToolStep[] = [];
     const allTools = new Set<string>();
+    const NGROK_URL = ngrokUrl;
+
+    const SONARQUBE_METRIC_KEYS: Record<string, string> = {
+        "Code Smells": "code_smells",
+        "Cyclomatic Complexity": "complexity",
+        "Cognitive Complexity": "cognitive_complexity",
+        "Duplicated Lines Density": "duplicated_lines_density",
+        "Total Coverage": "coverage"
+    };
+
+    const sonarMetricKeys: string[] = [];
+
+    function addResultPostStep(filename: string, toolName: string): MetricToolStep {
+        return {
+            name: `Send ${toolName} results to API`,
+            command: `curl -X POST ${NGROK_URL}/api/metrics \\
+  -H "Content-Type: application/json" \\
+  -H "X-Tool-Name: ${toolName}" \\
+  -H "X-Repo-Name: ${repo}" \\
+  --data @${filename}`
+        };
+    }
 
     selectedMetrics.forEach(metric => {
         const config = METRIC_MAP[language][metric];
         if (config) {
             config.steps.forEach(step => allSteps.push(step));
             config.tools.forEach(tool => allTools.add(tool));
+
+            if (config.tools.includes("SonarQube") && SONARQUBE_METRIC_KEYS[metric]) {
+                sonarMetricKeys.push(SONARQUBE_METRIC_KEYS[metric]);
+            }
+
+            if (metric === 'CVEs and CVSS') {
+                allSteps.push(addResultPostStep('trivy-results.json', 'Trivy'));
+            }
+            if (metric === 'Secret Detection') {
+                allSteps.push(addResultPostStep('gitleaks.json', 'GitLeaks'));
+            }
+            if (metric === 'Test Success Density') {
+                if (language === 'javascript') {
+                    allSteps.push(addResultPostStep('jest-results.json', 'Jest'));
+                } else {
+                    allSteps.push(addResultPostStep('pytest-results.xml', 'Pytest'));
+                }
+            }
         }
     });
 
@@ -161,23 +244,50 @@ export function generateGitHubActionsYaml(
         });
     }
 
-
     if (allTools.has('SonarQube')) {
         allSteps.push({
             name: 'Install SonarScanner',
             command: 'npm install -g sonarqube-scanner'
         });
+
         allSteps.push({
             name: 'Run SonarQube Analysis',
-            command: 'sonar-scanner -Dsonar.token=${{ secrets.SONAR_TOKEN }}'
+            command: `sonar-scanner \\
+  -Dsonar.projectKey=\${{ secrets.SONAR_PROJECT_KEY }} \\
+  -Dsonar.sources=src \\
+  -Dsonar.host.url=\${{ secrets.SONAR_HOST_URL }} \\
+  -Dsonar.login=\${{ secrets.SONAR_TOKEN }}`
         });
+
+        allSteps.push({
+            name: 'Wait for SonarQube Analysis to Complete',
+            command: `echo "Waiting for SonarQube analysis..." && \\
+while true; do \\
+  STATUS=$(curl -s -u \${{ secrets.SONAR_TOKEN }}: "\${{ secrets.SONAR_HOST_URL }}/api/ce/component?component=\${{ secrets.SONAR_PROJECT_KEY }}" | jq -r '.current.status'); \\
+  echo "Current SonarQube status: $STATUS"; \\
+  if [ "$STATUS" = "SUCCESS" ] || [ "$STATUS" = "FAILED" ]; then break; fi; \\
+  sleep 5; \\
+done`
+        });
+
+        if (sonarMetricKeys.length > 0) {
+            const metricsParam = sonarMetricKeys.join(',');
+            allSteps.push({
+                name: 'Fetch SonarQube Metrics',
+                command: `curl -s -u \${{ secrets.SONAR_TOKEN }}: \\
+  "\${{ secrets.SONAR_HOST_URL }}/api/measures/component?component=\${{ secrets.SONAR_PROJECT_KEY }}&metricKeys=${metricsParam}" \\
+  -o sonar-results.json`
+            });
+
+            allSteps.push(addResultPostStep('sonar-results.json', 'SonarQube'));
+        }
     }
 
     const stepsYaml = allSteps.map(step => {
         if (typeof step.command === 'string') {
             const indentedCommand = step.command
                 .split('\n')
-                .map(line => `          ${line.trim()}`) // 10 spaces
+                .map(line => `          ${line.trim()}`)
                 .join('\n');
 
             return `      - name: ${step.name}

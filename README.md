@@ -29,3 +29,23 @@ docker run -d --name sonarqube -p 9000:9000 sonarqube:lts
 npm install -g sonar-scanner
 
     ```
+
+# DevOps Quality Tool – Ngrok setup
+You can get your authtoken from: https://dashboard.ngrok.com/signup
+    ```bash
+install ngrok
+ngrok config add-authtoken (your_auth_token_here)
+ngrok http 4000
+    ```
+
+Add the generated ngrok URL to your .env file
+
+
+# DevOps Quality Tool – Postgres setup
+    ```bash
+brew install postgresql
+brew services start postgresql
+
+whoami in .env (use for database access)
+
+   ```
