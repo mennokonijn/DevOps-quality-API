@@ -36,10 +36,11 @@ const createTables = async () => {
       );
   
       CREATE TABLE IF NOT EXISTS scans (
-          id SERIAL PRIMARY KEY,
-          scan_id INTEGER REFERENCES scans(id) ON DELETE CASCADE,
-          started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
+        id SERIAL PRIMARY KEY,
+        repository_id INTEGER REFERENCES repositories(id) ON DELETE CASCADE,
+        started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
 
 
       CREATE TABLE IF NOT EXISTS plan_metrics (

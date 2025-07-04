@@ -5,6 +5,7 @@ import generateYamlRouter from './routes/generate-yaml-router';
 import dotenv from 'dotenv'
 import {createDatabase} from "./database/createDatabase";
 import createTables from "./database/createTables";
+import repositoryRouter from "./routes/repository-router";
 
 dotenv.config()
 
@@ -21,6 +22,7 @@ app.get('/api/health', (req: Request, res: Response) => {
 
 app.use('/api', metricRouter);
 app.use('/api', generateYamlRouter);
+app.use('/api', repositoryRouter);
 
 // 👇 Wrap in async function to await DB creation
 const startServer = async () => {

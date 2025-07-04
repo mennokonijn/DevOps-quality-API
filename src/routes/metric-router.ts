@@ -5,16 +5,18 @@ import {saveMetrics} from "../helpers/saveMetrics";
 import {extractResults} from "../helpers/extractResults";
 
 const router = express.Router();
+router.use(express.json());
+
 const BASE_RESULTS_DIR = path.join(__dirname, '../../data/results');
 
-const TOOLS = ['GitLeaks', 'Jest', 'SonarQube', 'Trivy'];
+const TOOLS = ['GitLeaks', 'Jest', 'SonarQube', 'Trivy', 'Jira-SprintPoints'];
 
 if (!fs.existsSync(BASE_RESULTS_DIR)) {
     fs.mkdirSync(BASE_RESULTS_DIR, { recursive: true });
 }
 
 
-router.post('/metrics', express.json(), async (req, res) => {
+router.post('/metrics', async (req, res) => {
     const tool = req.headers['x-tool-name'] as string || 'unknown';
     const rawRepoUrl = req.headers['x-repo-name'] as string || 'unknown/unknown-repo';
 

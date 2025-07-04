@@ -35,10 +35,11 @@ export const extractResults = async (repoName: any): Promise<Record<string, any>
     for (const scanRow of scansRes.rows) {
         const scanId = scanRow.id;
 
-        const [codeRes, testRes, cveRes] = await Promise.all([
+        const [codeRes, testRes, cveRes, planMetrics] = await Promise.all([
             client.query(`SELECT * FROM code_metrics WHERE scan_id = $1`, [scanId]),
             client.query(`SELECT * FROM test_metrics WHERE scan_id = $1`, [scanId]),
             client.query(`SELECT * FROM cve_vulnerabilities WHERE scan_id = $1`, [scanId]),
+            client.query(`SELECT * FROM plan_metrics WHERE scan_id = $1`, [scanId]),
         ]);
 
         const scan: Record<string, { name: string; value: string }[]> = {
@@ -81,6 +82,13 @@ export const extractResults = async (repoName: any): Promise<Record<string, any>
                 name: 'CVE identifiers and CVSS scores',
                 value: `Total: ${cveRes.rowCount}, Avg CVSS: ${avg}\n${detail}`,
             });
+        }
+
+        if (planMetrics.rowCount) {
+            const p = planMetrics.rows[0];
+            scan.Plan.push(
+                { name: 'Latest sprint velocity', value: (p.estimated_vs_completed_story_points ? Number(p.estimated_vs_completed_story_points || 0).toFixed(1) + '%' : '-') }
+            );
         }
 
         results.push(scan);
