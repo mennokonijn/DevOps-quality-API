@@ -77,7 +77,6 @@ export const extractResults = async (repoName: any): Promise<Record<string, any>
             const avg = scores.length ? (scores.reduce((a, b) => +a + +b, 0) / scores.length).toFixed(1) : '-';
             const detail = cveRes.rows.map((r: any) => `- ${r.cve_id} [${r.severity}] → ${r.score}`).join('\n');
 
-            console.log(scores);
             scan.Build.push({
                 name: 'CVE identifiers and CVSS scores',
                 value: `Total: ${cveRes.rowCount}, Avg CVSS: ${avg}\n${detail}`,
