@@ -29,7 +29,6 @@ export const saveMetrics = async (repo: string, tool: string, req: any) => {
         repositoryId = insertRes.rows[0].id;
     }
 
-    // 1. Check if a scan exists for this repo in the last X minutes
     const scanRes = await client.query(
         `SELECT id FROM scans
            WHERE repository_id = $1
@@ -49,7 +48,6 @@ export const saveMetrics = async (repo: string, tool: string, req: any) => {
                 );
                 scanId = insertScan.rows[0].id;
             }
-
 
     if (tool === 'SonarQube') {
         const measures = req.body?.component?.measures ?? [];
@@ -134,6 +132,37 @@ export const saveMetrics = async (repo: string, tool: string, req: any) => {
 
         console.log(`Jest test metrics saved for repository "${repo}"`);
     }
+
+    else if (tool === 'Jira-SprintPoints') {
+        const sprints = req.body;
+
+        if (!Array.isArray(sprints) || sprints.length === 0) {
+            console.warn('No sprint data received');
+            return;
+        }
+
+        const latestSprint = sprints[sprints.length - 1];
+
+        const estimated = Number(latestSprint.estimated);
+        const completed = Number(latestSprint.completed);
+
+        const ratio =
+            estimated > 0
+                ? (completed / estimated) * 100
+                : null;
+
+        await client.query(
+            `INSERT INTO plan_metrics (
+            scan_id, estimated_vs_completed_story_points
+         ) VALUES ($1, $2)
+         ON CONFLICT (scan_id) DO UPDATE
+         SET estimated_vs_completed_story_points = EXCLUDED.estimated_vs_completed_story_points;`,
+            [scanId, ratio]
+        );
+
+        console.log(`Jira Sprint Points saved for "${repo}" (Sprint: ${latestSprint.sprint})`);
+    }
+
 
     client.release();
 }
