@@ -8,7 +8,6 @@ const SONARQUBE_METRIC_KEYS = [
     'coverage'
 ];
 
-// New TOOL_MAP keyed by tool name
 export const TOOL_MAP: Record<string, ToolConfig> = {
     SonarQube: {
         steps: [

@@ -51,7 +51,6 @@ export function generateGitHubActionsYaml(
             allSteps.push(...config.steps);
         }
 
-        // Add API result upload steps if needed
         if (tool === 'SonarQube') {
             allSteps.push({
                 name: 'Send SonarQube results to API',
@@ -124,7 +123,6 @@ ${indentedCommand}${continueOnError}`;
 
             }
 
-            // command is object (uses)
             const usesLine = `        uses: ${step.command.uses}`;
             const withBlock = step.command.with
                 ? '        with:\n' +

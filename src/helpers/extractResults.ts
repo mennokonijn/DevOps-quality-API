@@ -20,7 +20,7 @@ export const extractResults = async (repoName: any): Promise<Record<string, any>
 
     if (repoRes.rows.length === 0) {
         client.release();
-        return []; // No repository found
+        return [];
     }
 
     const repositoryId = repoRes.rows[0].id;

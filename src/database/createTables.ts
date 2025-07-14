@@ -118,9 +118,9 @@ const createTables = async () => {
 
     `);
 
-        console.log('✅ Tables created (or already exist)');
+        console.log('Tables created (or already exist)');
     } catch (err) {
-        console.error('❌ Error creating tables:', err);
+        console.error('Error creating tables:', err);
     } finally {
         await client.end();
     }

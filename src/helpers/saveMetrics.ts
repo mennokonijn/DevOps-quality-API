@@ -29,7 +29,6 @@ export const saveMetrics = async (repo: string, tool: string, req: any) => {
         repositoryId = insertRes.rows[0].id;
     }
 
-    // 1. Check if a scan exists for this repo in the last X minutes
     const scanRes = await client.query(
         `SELECT id FROM scans
            WHERE repository_id = $1
@@ -142,7 +141,6 @@ export const saveMetrics = async (repo: string, tool: string, req: any) => {
             return;
         }
 
-        // Get the last sprint (latest in array)
         const latestSprint = sprints[sprints.length - 1];
 
         const estimated = Number(latestSprint.estimated);
