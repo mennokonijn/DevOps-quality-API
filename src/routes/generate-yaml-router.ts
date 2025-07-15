@@ -4,8 +4,8 @@ import { generateGitHubActionsYaml } from '../helpers/generatePipeline';
 const router = express.Router();
 
 router.post('/generate-yaml', (req, res) => {
-    let { language, tools, repo, branch, directory } = req.body;
-    if (!language || !tools || !repo || !branch) {
+    let { tools, repo, branch, directory } = req.body;
+    if (!tools || !repo || !branch) {
         return res.status(400).json({ error: 'language, metrics, and repo are required' });
     }
 

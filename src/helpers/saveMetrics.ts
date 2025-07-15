@@ -163,6 +163,40 @@ export const saveMetrics = async (repo: string, tool: string, req: any) => {
         console.log(`Jira Sprint Points saved for "${repo}" (Sprint: ${latestSprint.sprint})`);
     }
 
+    else if (tool === 'GitLeaks') {
+        const findings = req.body ?? [];
+
+        console.log(findings);
+
+        for (const finding of findings) {
+            const rule = finding.RuleID || 'unknown';
+            const file = finding.File || 'unknown';
+            const line = finding.StartLine || 0;
+            const description = finding.Description || '';
+            const detectedAt = finding.date || new Date().toISOString();
+
+            await client.query(
+                `INSERT INTO gitleaks_findings (
+                scan_id, rule, file_path, line_number, description, detected_at
+            ) VALUES ($1, $2, $3, $4, $5, $6);`,
+                [scanId, rule, file, line, description, detectedAt]
+            );
+        }
+
+        const secretCount = Array.isArray(findings) ? findings.length : 0;
+
+        await client.query(
+            `INSERT INTO build_metrics (scan_id, secret_detection)
+         VALUES ($1, $2)
+         ON CONFLICT (scan_id) DO UPDATE
+         SET secret_detection = EXCLUDED.secret_detection;`,
+            [scanId, secretCount]
+        );
+
+        console.log(`GitLeaks findings saved for repository "${repo}"`);
+    }
+
+
 
     client.release();
 }

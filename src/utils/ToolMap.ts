@@ -56,14 +56,6 @@ done`
             {
                 name: "Run GitLeaks",
                 command: `
-echo "[allowlist]
-description = \\"Exclude common non-source directories\\"
-paths = [
-  '''\\\\.cache/''',
-  '''node_modules/''',
-  '''dist/'''
-]" > .gitleaks.toml
-
 gitleaks detect \\
   --source=. \\
   --config=.gitleaks.toml \\

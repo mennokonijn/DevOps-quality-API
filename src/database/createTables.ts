@@ -16,6 +16,7 @@ const createTables = async () => {
 
     // await client.query(`
     //   DROP TABLE IF EXISTS
+    //     gitleaks_findings,
     //     cve_vulnerabilities,
     //     operate_monitor_metrics,
     //     deploy_release_metrics,
@@ -115,6 +116,18 @@ const createTables = async () => {
       score NUMERIC NOT NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
+
+    CREATE TABLE IF NOT EXISTS gitleaks_findings (
+      id SERIAL PRIMARY KEY,
+      scan_id INTEGER REFERENCES scans(id) ON DELETE CASCADE,
+      rule TEXT NOT NULL,
+      file_path TEXT NOT NULL,
+      line_number INTEGER,
+      description TEXT,
+      detected_at TIMESTAMP,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
 
     `);
 

@@ -35,12 +35,14 @@ export const extractResults = async (repoName: any): Promise<Record<string, any>
     for (const scanRow of scansRes.rows) {
         const scanId = scanRow.id;
 
-        const [codeRes, testRes, cveRes, planMetrics] = await Promise.all([
+        const [codeRes, testRes, cveRes, planMetrics, gitleaksRes] = await Promise.all([
             client.query(`SELECT * FROM code_metrics WHERE scan_id = $1`, [scanId]),
             client.query(`SELECT * FROM test_metrics WHERE scan_id = $1`, [scanId]),
             client.query(`SELECT * FROM cve_vulnerabilities WHERE scan_id = $1`, [scanId]),
             client.query(`SELECT * FROM plan_metrics WHERE scan_id = $1`, [scanId]),
+            client.query(`SELECT * FROM gitleaks_findings WHERE scan_id = $1`, [scanId]), // NEW
         ]);
+
 
         const scan: Record<string, { name: string; value: string }[]> = {
             Plan: [],
@@ -83,6 +85,21 @@ export const extractResults = async (repoName: any): Promise<Record<string, any>
             });
         }
 
+        // GitLeaks
+        if (gitleaksRes.rowCount) {
+            const count = gitleaksRes.rowCount;
+            const ruleSummary = gitleaksRes.rows
+                .map((r: any) => `- ${r.rule} in ${r.file_path}:${r.line_number}`)
+                .join('\n');
+
+            scan.Build.push({
+                name: 'Secrets detected by GitLeaks',
+                value: `Total: ${count}\n${ruleSummary}`,
+            });
+        }
+
+
+        // Plan metrics
         if (planMetrics.rowCount) {
             const p = planMetrics.rows[0];
             scan.Plan.push(
