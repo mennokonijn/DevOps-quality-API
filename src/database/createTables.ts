@@ -17,6 +17,8 @@ const createTables = async () => {
     // await client.query(`
     //   DROP TABLE IF EXISTS
     //     gitleaks_findings,
+    //     outdated_packages,
+    //     project_licenses,
     //     cve_vulnerabilities,
     //     operate_monitor_metrics,
     //     deploy_release_metrics,
@@ -112,6 +114,7 @@ const createTables = async () => {
       id SERIAL PRIMARY KEY,
       scan_id INTEGER REFERENCES scans(id) ON DELETE CASCADE,
       cve_id TEXT NOT NULL,
+      package_name TEXT NOT NULL,
       severity TEXT NOT NULL,
       score NUMERIC NOT NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -127,6 +130,29 @@ const createTables = async () => {
       detected_at TIMESTAMP,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
+    
+    CREATE TABLE IF NOT EXISTS project_licenses (
+      id SERIAL PRIMARY KEY,
+      scan_id INTEGER REFERENCES scans(id) ON DELETE CASCADE,
+      license_name TEXT NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE (scan_id, license_name)
+    );
+
+
+
+    CREATE TABLE IF NOT EXISTS outdated_packages (
+      id SERIAL PRIMARY KEY,
+      scan_id INTEGER REFERENCES scans(id) ON DELETE CASCADE,
+      package_name TEXT NOT NULL,
+      installed_version TEXT,
+      fixed_versions TEXT,
+      severity TEXT,
+      file_path TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE (scan_id, package_name)
+    );
+
 
 
     `);

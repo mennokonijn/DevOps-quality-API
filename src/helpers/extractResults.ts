@@ -35,14 +35,15 @@ export const extractResults = async (repoName: any): Promise<Record<string, any>
     for (const scanRow of scansRes.rows) {
         const scanId = scanRow.id;
 
-        const [codeRes, testRes, cveRes, planMetrics, gitleaksRes] = await Promise.all([
+        const [codeRes, testRes, cveRes, planMetrics, gitleaksRes, outdatedRes, licenseRes] = await Promise.all([
             client.query(`SELECT * FROM code_metrics WHERE scan_id = $1`, [scanId]),
             client.query(`SELECT * FROM test_metrics WHERE scan_id = $1`, [scanId]),
             client.query(`SELECT * FROM cve_vulnerabilities WHERE scan_id = $1`, [scanId]),
             client.query(`SELECT * FROM plan_metrics WHERE scan_id = $1`, [scanId]),
-            client.query(`SELECT * FROM gitleaks_findings WHERE scan_id = $1`, [scanId]), // NEW
+            client.query(`SELECT * FROM gitleaks_findings WHERE scan_id = $1`, [scanId]),
+            client.query(`SELECT * FROM outdated_packages WHERE scan_id = $1`, [scanId]),
+            client.query(`SELECT * FROM project_licenses WHERE scan_id = $1`, [scanId]),
         ]);
-
 
         const scan: Record<string, { name: string; value: string }[]> = {
             Plan: [],
@@ -53,7 +54,7 @@ export const extractResults = async (repoName: any): Promise<Record<string, any>
             OperateMonitor: [],
         };
 
-        // Code metrics
+        // SonarQube metrics
         if (codeRes.rowCount) {
             const c = codeRes.rows[0];
             scan.Code.push(
@@ -63,6 +64,20 @@ export const extractResults = async (repoName: any): Promise<Record<string, any>
                 { name: 'Duplicated Lines Density', value: c.duplicated_lines_density?.toString() ?? '-' }
             );
         }
+
+        // Library Freshness
+        if (outdatedRes.rowCount) {
+            const total = outdatedRes.rowCount;
+            const list = outdatedRes.rows.map((r: any) =>
+                `- ${r.package_name} ${r.installed_version} → ${r.fixed_versions ?? '?'}`
+            ).join('\n');
+
+            scan.Code.push({
+                name: 'Library Freshness (Outdated Packages)',
+                value: `Outdated Libraries: ${total}\n${list}`,
+            });
+        }
+
 
         // Test metrics
         if (testRes.rowCount) {
@@ -94,8 +109,18 @@ export const extractResults = async (repoName: any): Promise<Record<string, any>
 
             scan.Build.push({
                 name: 'Secrets detected by GitLeaks',
-                value: `Total: ${count}\n${ruleSummary}`,
+                value: `Total Leaks: ${count}\n${ruleSummary}`,
             });
+        }
+
+        // project licenses
+        if (licenseRes.rowCount) {
+            const uniqueLicenses = Array.from(new Set(licenseRes.rows.map((r: any) => r.license_name))).sort();
+            scan.Build.push({
+                name: 'Open Source Licenses',
+                value: uniqueLicenses.join('\n')
+            });
+
         }
 
 

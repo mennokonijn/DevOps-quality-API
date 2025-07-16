@@ -113,7 +113,7 @@ export function generateGitHubActionsYaml(
                 const dedented = typeof step.command === 'string' ? dedent(step.command) : '';
                 const indentedCommand = dedented
                     .split('\n')
-                    .map(line => `          ${line}`)  // 10 spaces here (6 for step + 2 for run: + 2 extra)
+                    .map(line => `          ${line}`)
                     .join('\n');
 
                 const continueOnError = step.continueOnError ? '\n        continue-on-error: true' : '';

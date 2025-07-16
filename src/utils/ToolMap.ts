@@ -58,7 +58,6 @@ done`
                 command: `
 gitleaks detect \\
   --source=. \\
-  --config=.gitleaks.toml \\
   --report-format json \\
   --report-path=gitleaks.json \\
   --no-git
@@ -70,20 +69,23 @@ gitleaks detect \\
     Trivy: {
         steps: [
             {
-                name: 'Run Trivy Scan',
-                command: {
-                    uses: 'aquasecurity/trivy-action@master',
-                    with: {
-                        'scan-type': 'fs',
-                        'scan-ref': '.',
-                        format: 'json',
-                        output: 'trivy-results.json'
-                    }
-                }
+                name: 'Install Trivy',
+                command: `curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin`
+            },
+            {
+                name: 'Install CycloneDX SBOM Generator',
+                command: `npm install --save-dev @cyclonedx/cyclonedx-npm`
+            },
+            {
+                name: 'Generate SBOM (CycloneDX JSON)',
+                command: `npx cyclonedx-npm --output-format json > bom.json`
+            },
+            {
+                name: 'Run Trivy on SBOM (licenses + CVEs)',
+                command: `trivy sbom --scanners vuln,license --format json --output trivy-results.json bom.json`
             }
         ]
     },
-
     Jest: {
         steps: [
             {

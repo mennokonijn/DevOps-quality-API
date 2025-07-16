@@ -92,25 +92,70 @@ export const saveMetrics = async (repo: string, tool: string, req: any) => {
 
     else if (tool === 'Trivy') {
         const results = req.body?.Results ?? [];
+        const seen = new Set();
+        const uniqueLicenses = new Set<string>();
 
         for (const result of results) {
             const vulns = result.Vulnerabilities ?? [];
             for (const vuln of vulns) {
+                const key = `${vuln.VulnerabilityID}:${vuln.PkgName}`;
+                if (seen.has(key)) continue;
+                seen.add(key);
+
                 const id = vuln?.VulnerabilityID ?? 'Unknown CVE';
                 const severity = vuln?.Severity ?? 'UNKNOWN';
                 const score = vuln?.CVSS?.ghsa?.V3Score ?? vuln?.CVSS?.nvd?.V3Score;
+                const pkg = vuln?.PkgName;
+                const installed = vuln?.InstalledVersion;
+                const fixed = vuln?.FixedVersion;
+                const file = result?.Target;
+                const title = vuln?.Title?.toLowerCase() ?? '';
+                const description = vuln?.Description?.toLowerCase() ?? '';
+                const isLicenseIssue = title.includes('license') || description.includes('license');
 
                 if (typeof score === 'number') {
                     await client.query(
-                        `INSERT INTO cve_vulnerabilities (scan_id, cve_id, severity, score)
-                                VALUES ($1, $2, $3, $4);`,
-                        [scanId, id, severity, score]
+                        `INSERT INTO cve_vulnerabilities (scan_id, cve_id, package_name, severity, score)
+                                VALUES ($1, $2, $3, $4, $5);`,
+                        [scanId, id, pkg, severity, score]
                     );
+                }
+
+                if (pkg && installed && fixed && fixed !== installed) {
+                    await client.query(
+                        `INSERT INTO outdated_packages (scan_id, package_name, installed_version, fixed_versions, severity, file_path)
+                           VALUES ($1, $2, $3, $4, $5, $6)
+                           ON CONFLICT (scan_id, package_name)
+                           DO UPDATE SET
+                             installed_version = EXCLUDED.installed_version,
+                             fixed_versions = EXCLUDED.fixed_versions,
+                             severity = EXCLUDED.severity,
+                             file_path = EXCLUDED.file_path;`,
+                        [scanId, pkg, installed, fixed, severity, file]
+                    );
+
+                }
+            }
+
+            const licenses = result.Licenses ?? [];
+            for (const license of licenses) {
+                if (license.Name) {
+                    uniqueLicenses.add(license.Name);
                 }
             }
         }
 
-        console.log(`Trivy vulnerabilities saved for repository "${repo}"`);
+        for (const licenseName of uniqueLicenses) {
+            await client.query(
+                `INSERT INTO project_licenses (scan_id, license_name)
+                     VALUES ($1, $2)
+                     ON CONFLICT (scan_id, license_name) DO NOTHING;`,
+                [scanId, licenseName]
+            );
+        }
+
+
+        console.log(`Trivy results saved for repository "${repo}"`);
     }
 
     else if (tool === 'Jest') {
