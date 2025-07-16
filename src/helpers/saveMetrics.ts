@@ -211,8 +211,6 @@ export const saveMetrics = async (repo: string, tool: string, req: any) => {
     else if (tool === 'GitLeaks') {
         const findings = req.body ?? [];
 
-        console.log(findings);
-
         for (const finding of findings) {
             const rule = finding.RuleID || 'unknown';
             const file = finding.File || 'unknown';
@@ -239,6 +237,56 @@ export const saveMetrics = async (repo: string, tool: string, req: any) => {
         );
 
         console.log(`GitLeaks findings saved for repository "${repo}"`);
+    }
+
+    else if (tool === 'Jira-Security-Epics') {
+        const epics = req.body.issues ?? [];
+
+        if (!Array.isArray(epics) || epics.length === 0) {
+            console.warn('No epic data received');
+            return;
+        }
+
+        const totalEpics = epics.length;
+        const securityEpics = epics.filter((epic: any) => {
+                return Array.isArray(epic.fields?.labels) && epic.fields.labels.some((label: string) => label.toLowerCase().includes('security'))
+            }
+
+        );
+        const securityCount = securityEpics.length;
+
+        const coverage =
+            totalEpics > 0
+                ? parseFloat(((securityCount / totalEpics) * 100).toFixed(1))
+                : null;
+
+        await client.query(
+            `INSERT INTO plan_metrics (
+            scan_id, security_requirements_coverage
+        ) VALUES ($1, $2)
+        ON CONFLICT (scan_id) DO UPDATE
+        SET security_requirements_coverage = EXCLUDED.security_requirements_coverage;`,
+            [scanId, coverage]
+        );
+
+        console.log(`Security requirements coverage saved for repository "${repo}": ${securityCount}/${totalEpics} (${coverage}%)`);
+    }
+
+    else if (tool === 'Jira-Security-Incidents') {
+        const issues = req.body?.issues ?? [];
+        console.log(req.body)
+        const incidentCount = issues.length;
+
+        await client.query(
+            `INSERT INTO operate_monitor_metrics (
+            scan_id, security_incidents
+         ) VALUES ($1, $2)
+         ON CONFLICT (scan_id) DO UPDATE
+         SET security_incidents = EXCLUDED.security_incidents;`,
+            [scanId, incidentCount]
+        );
+
+        console.log(`Saved ${incidentCount} security incidents during sprint for "${repo}"`);
     }
 
 

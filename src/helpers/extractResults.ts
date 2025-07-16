@@ -35,7 +35,7 @@ export const extractResults = async (repoName: any): Promise<Record<string, any>
     for (const scanRow of scansRes.rows) {
         const scanId = scanRow.id;
 
-        const [codeRes, testRes, cveRes, planMetrics, gitleaksRes, outdatedRes, licenseRes] = await Promise.all([
+        const [codeRes, testRes, cveRes, planMetrics, gitleaksRes, outdatedRes, licenseRes, OperateMonitorMetrics] = await Promise.all([
             client.query(`SELECT * FROM code_metrics WHERE scan_id = $1`, [scanId]),
             client.query(`SELECT * FROM test_metrics WHERE scan_id = $1`, [scanId]),
             client.query(`SELECT * FROM cve_vulnerabilities WHERE scan_id = $1`, [scanId]),
@@ -43,6 +43,7 @@ export const extractResults = async (repoName: any): Promise<Record<string, any>
             client.query(`SELECT * FROM gitleaks_findings WHERE scan_id = $1`, [scanId]),
             client.query(`SELECT * FROM outdated_packages WHERE scan_id = $1`, [scanId]),
             client.query(`SELECT * FROM project_licenses WHERE scan_id = $1`, [scanId]),
+            client.query(`SELECT * FROM operate_monitor_metrics WHERE scan_id = $1`, [scanId]),
         ]);
 
         const scan: Record<string, { name: string; value: string }[]> = {
@@ -129,6 +130,17 @@ export const extractResults = async (repoName: any): Promise<Record<string, any>
             const p = planMetrics.rows[0];
             scan.Plan.push(
                 { name: 'Latest sprint velocity', value: (p.estimated_vs_completed_story_points ? Number(p.estimated_vs_completed_story_points || 0).toFixed(1) + '%' : '-') }
+            );
+            scan.Plan.push(
+                { name: 'Security Requirements Coverage', value : (p.security_requirements_coverage ? Number(p.security_requirements_coverage || 0).toFixed(1) + '%' : '-') }
+            );
+        }
+
+        // Operate and Monitor metrics
+        if (OperateMonitorMetrics.rowCount) {
+            const o = OperateMonitorMetrics.rows[0];
+            scan.OperateMonitor.push(
+                { name: 'Security Incidents', value: (o.security_incidents ? Number(o.security_incidents || 0).toFixed(1) : '-') },
             );
         }
 

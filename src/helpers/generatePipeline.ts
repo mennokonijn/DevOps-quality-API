@@ -105,6 +105,28 @@ export function generateGitHubActionsYaml(
   --data @sprint_points.json`
             });
         }
+
+        if (tool === 'Jira-Security-Epics') {
+            allSteps.push({
+                name: 'Send Epics to API',
+                command: `curl -X POST ${NGROK_URL}/api/metrics \\
+  -H 'Content-Type: application/json' \\
+  -H 'X-Tool-Name: Jira-Security-Epics' \\
+  -H 'X-Repo-Name: ${repo}' \\
+  --data @epics.json`
+            });
+        }
+
+        if (tool === 'Jira-Security-Incidents') {
+            allSteps.push({
+                name: 'Send Security Incidents to API',
+                command: `curl -X POST ${NGROK_URL}/api/metrics \\
+  -H 'Content-Type: application/json' \\
+  -H 'X-Tool-Name: Jira-Security-Incidents' \\
+  -H 'X-Repo-Name: ${repo}' \\
+  --data @security_incidents.json`
+            });
+        }
     });
 
     const stepsYaml = allSteps

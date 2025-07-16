@@ -150,5 +150,56 @@ echo "$results" > sprint_points.json
       `.trim()
             }
         ]
+    },
+    'Jira-Security-Epics': {
+        steps: [
+            {
+                name: 'Fetch Epics from JIRA',
+                command: `
+echo "Fetching epics from JIRA..."
+
+epics=$(curl -s -u \${{ secrets.JIRA_EMAIL }}:\${{ secrets.JIRA_TOKEN }} \\
+  -G --data-urlencode "jql=issuetype=Epic" \\
+  "\${{ secrets.JIRA_URL }}/rest/api/2/search?fields=key,summary,labels")
+
+echo "$epics" > epics.json
+      `.trim()
+            }
+        ]
+    },
+    'Jira-Security-Incidents': {
+        steps: [
+            {
+                name: 'Fetch Security Incidents Created During Sprint',
+                command: `
+echo "Fetching current active sprint..."
+
+active_sprint=$(curl -s -u \${{ secrets.JIRA_EMAIL }}:\${{ secrets.JIRA_TOKEN }} \\
+  "\${{ secrets.JIRA_URL }}/rest/agile/1.0/board/\${{ secrets.JIRA_BOARD }}/sprint?state=active" | jq '.values[0]')
+
+sprint_id=$(echo "$active_sprint" | jq -r '.id')
+sprint_name=$(echo "$active_sprint" | jq -r '.name')
+start_date=$(echo "$active_sprint" | jq -r '.startDate' | cut -d'T' -f1)
+end_date=$(echo "$active_sprint" | jq -r '.endDate' | cut -d'T' -f1)
+
+if [ -z "$start_date" ] || [ -z "$end_date" ]; then
+  echo "Sprint dates not found. Exiting early."
+  exit 1
+fi
+
+echo "Active sprint: $sprint_name (ID: $sprint_id)"
+echo "Start: $start_date"
+echo "End:   $end_date"
+
+echo "Fetching security incidents created during sprint timeframe..."
+
+incidents=$(curl -s -u \${{ secrets.JIRA_EMAIL }}:\${{ secrets.JIRA_TOKEN }} \\
+  -G --data-urlencode "jql=labels in (\\"security-incident\\", \\"vulnerability\\") AND created >= \\"$start_date\\" AND created <= \\"$end_date\\"" \\
+  "\${{ secrets.JIRA_URL }}/rest/api/2/search?fields=key,summary,created")
+
+echo "$incidents" > security_incidents.json
+      `.trim()
+            }
+        ]
     }
 };
