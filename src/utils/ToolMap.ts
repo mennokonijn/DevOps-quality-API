@@ -239,5 +239,44 @@ curl -s -H "Authorization: token \${{ secrets.GITHUB_TOKEN }}" \\
             `.trim()
             }
         ]
+    },
+    'Depcheck': {
+        steps: [
+            {
+                name: 'Install Depcheck',
+                command: 'npm install -g depcheck'
+            },
+            {
+                name: 'Run Depcheck',
+                command: 'depcheck --json > depcheck-results.json || true'
+            }
+        ]
+    },
+    'ZAP': {
+        steps: [
+            {
+                name: 'Start Express App',
+                command: 'PORT={{PORT}} {{START_COMMAND}} &'
+            },
+            {
+                name: 'Wait for app to be ready',
+                command: 'sleep 10'
+            },
+            {
+                name: 'Run OWASP ZAP Baseline Scan',
+                command: `
+docker run -u root --network host \\
+  -v $(pwd):/zap/wrk/:rw \\
+  ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \\
+  -t http://localhost:{{PORT}} \\
+  -g zap-gen.conf \\
+  -r zap-report.html \\
+  -J zap-report.json \\
+  -z "-config api.disablekey=true"
+            `.trim(),
+                continueOnError: true
+            }
+        ]
     }
+
 };

@@ -36,15 +36,30 @@ export function generateGitHubActionsYaml(
     selectedTools: string[],
     repo: string,
     workingDir = '.',
-    branch = 'master'
+    branch = 'master',
+    port?: number,
+    startCommand?: string
 ): string {
     const allSteps: ToolStep[] = [];
 
-    console.log('Selected tools:', selectedTools);
-
     selectedTools.forEach(tool => {
-        const config = TOOL_MAP[tool];
+        let config = TOOL_MAP[tool];
         if (!config) return;
+
+        if (tool === 'ZAP') {
+            config = JSON.parse(JSON.stringify(config)); // deep clone
+            config.steps = config.steps.map((step) => {
+                if (typeof step.command === 'string') {
+                    return {
+                        ...step,
+                        command: step.command
+                            .replace(/{{PORT}}/g, String(port ?? 8080))
+                            .replace(/{{START_COMMAND}}/g, startCommand ?? 'npm run start'),
+                    };
+                }
+                return step;
+            });
+        }
 
         if (tool === 'GitLeaks') {
             allSteps.push(...config.steps.slice(0, 1));
@@ -154,6 +169,28 @@ export function generateGitHubActionsYaml(
   -H 'X-Tool-Name: Language-Impact' \\
   -H 'X-Repo-Name: ${repo}' \\
   --data @languages.json`
+            });
+        }
+
+        if (tool === 'Depcheck') {
+            allSteps.push({
+                name: 'Send Depcheck results to API',
+                command: `curl -X POST ${NGROK_URL}/api/metrics \\
+  -H 'Content-Type: application/json' \\
+  -H 'X-Tool-Name: Depcheck' \\
+  -H 'X-Repo-Name: ${repo}' \\
+  --data @depcheck-results.json`
+            });
+        }
+
+        else if (tool === 'ZAP') {
+            allSteps.push({
+                name: 'Send ZAP results to API',
+                command: `curl -X POST ${NGROK_URL}/api/metrics \\
+  -H 'Content-Type: application/json' \\
+  -H 'X-Tool-Name: ZAP' \\
+  -H 'X-Repo-Name: ${repo}' \\
+  --data @zap-report.json`
             });
         }
     });

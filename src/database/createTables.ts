@@ -27,6 +27,7 @@ const createTables = async () => {
     //     code_metrics,
     //     plan_metrics,
     //     repositories,
+    //     zap_alerts,
     //     scans
     //   CASCADE;
     // `);
@@ -74,7 +75,7 @@ const createTables = async () => {
         avg_cvss_score NUMERIC,
         secret_detection NUMERIC,
         license_scan_issues NUMERIC,
-        unused_libraries NUMERIC,
+        unused_libraries TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
@@ -153,8 +154,17 @@ const createTables = async () => {
       UNIQUE (scan_id, package_name)
     );
 
-
-
+    CREATE TABLE IF NOT EXISTS zap_alerts (
+      id SERIAL PRIMARY KEY,
+      scan_id INTEGER REFERENCES scans(id) ON DELETE CASCADE,
+      alert TEXT NOT NULL,
+      confidence TEXT,
+      solution TEXT,
+      description TEXT,
+      riskcode TEXT,
+      reference TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
     `);
 
         console.log('Tables created (or already exist)');

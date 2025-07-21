@@ -329,5 +329,50 @@ export const saveMetrics = async (repo: string, tool: string, req: any) => {
         console.log(`Saved language energy impact (${energy} J) for repo "${repo}"`);
     }
 
+    else if (tool === 'Depcheck') {
+        const body = req.body ?? {};
+        const unusedList = Array.isArray(body.dependencies) ? body.dependencies : [];
+
+        const unusedString = unusedList.join(', ');
+        const unusedCount = unusedList.length;
+
+        await client.query(
+            `INSERT INTO build_metrics (scan_id, unused_libraries)
+         VALUES ($1, $2)
+         ON CONFLICT (scan_id) DO UPDATE
+         SET unused_libraries = EXCLUDED.unused_libraries;`,
+            [scanId, unusedString]
+        );
+
+        console.log(`Saved ${unusedCount} unused libraries for "${repo}": ${unusedString}`);
+    }
+
+    else if (tool === 'ZAP') {
+        const body = req.body ?? {};
+        const site = body?.site?.[0];
+        const alerts = Array.isArray(site?.alerts) ? site.alerts : [];
+
+        for (const alert of alerts) {
+            await client.query(
+                `INSERT INTO zap_alerts (
+              scan_id, alert, confidence, solution, description, riskcode, reference
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7);`,
+                [
+                    scanId,
+                    alert.alert || 'Unknown',
+                    alert.confidence || null,
+                    alert.solution.replace(/<\/?p>/g, '') || null,
+                    alert.riskdesc.replace(/<\/?p>/g, '') || null,
+                    alert.riskcode || '-',
+                    alert.reference.replace(/<\/?p>/g, '') || null
+                ]
+            );
+        }
+
+        console.log(`Saved ZAP alerts for "${repo}"`);
+    }
+
+
+
     client.release();
 }
