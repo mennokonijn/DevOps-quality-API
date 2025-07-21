@@ -16,6 +16,9 @@ const createTables = async () => {
 
     // await client.query(`
     //   DROP TABLE IF EXISTS
+    //     gitleaks_findings,
+    //     outdated_packages,
+    //     project_licenses,
     //     cve_vulnerabilities,
     //     operate_monitor_metrics,
     //     deploy_release_metrics,
@@ -24,6 +27,7 @@ const createTables = async () => {
     //     code_metrics,
     //     plan_metrics,
     //     repositories,
+    //     zap_alerts,
     //     scans
     //   CASCADE;
     // `);
@@ -71,7 +75,7 @@ const createTables = async () => {
         avg_cvss_score NUMERIC,
         secret_detection NUMERIC,
         license_scan_issues NUMERIC,
-        unused_libraries NUMERIC,
+        unused_libraries TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
@@ -111,11 +115,56 @@ const createTables = async () => {
       id SERIAL PRIMARY KEY,
       scan_id INTEGER REFERENCES scans(id) ON DELETE CASCADE,
       cve_id TEXT NOT NULL,
+      package_name TEXT NOT NULL,
       severity TEXT NOT NULL,
       score NUMERIC NOT NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
+    CREATE TABLE IF NOT EXISTS gitleaks_findings (
+      id SERIAL PRIMARY KEY,
+      scan_id INTEGER REFERENCES scans(id) ON DELETE CASCADE,
+      rule TEXT NOT NULL,
+      file_path TEXT NOT NULL,
+      line_number INTEGER,
+      description TEXT,
+      detected_at TIMESTAMP,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    
+    CREATE TABLE IF NOT EXISTS project_licenses (
+      id SERIAL PRIMARY KEY,
+      scan_id INTEGER REFERENCES scans(id) ON DELETE CASCADE,
+      license_name TEXT NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE (scan_id, license_name)
+    );
+
+
+
+    CREATE TABLE IF NOT EXISTS outdated_packages (
+      id SERIAL PRIMARY KEY,
+      scan_id INTEGER REFERENCES scans(id) ON DELETE CASCADE,
+      package_name TEXT NOT NULL,
+      installed_version TEXT,
+      fixed_versions TEXT,
+      severity TEXT,
+      file_path TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE (scan_id, package_name)
+    );
+
+    CREATE TABLE IF NOT EXISTS zap_alerts (
+      id SERIAL PRIMARY KEY,
+      scan_id INTEGER REFERENCES scans(id) ON DELETE CASCADE,
+      alert TEXT NOT NULL,
+      confidence TEXT,
+      solution TEXT,
+      description TEXT,
+      riskcode TEXT,
+      reference TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
     `);
 
         console.log('Tables created (or already exist)');

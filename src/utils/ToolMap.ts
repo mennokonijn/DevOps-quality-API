@@ -56,17 +56,8 @@ done`
             {
                 name: "Run GitLeaks",
                 command: `
-echo "[allowlist]
-description = \\"Exclude common non-source directories\\"
-paths = [
-  '''\\\\.cache/''',
-  '''node_modules/''',
-  '''dist/'''
-]" > .gitleaks.toml
-
 gitleaks detect \\
   --source=. \\
-  --config=.gitleaks.toml \\
   --report-format json \\
   --report-path=gitleaks.json \\
   --no-git
@@ -78,20 +69,23 @@ gitleaks detect \\
     Trivy: {
         steps: [
             {
-                name: 'Run Trivy Scan',
-                command: {
-                    uses: 'aquasecurity/trivy-action@master',
-                    with: {
-                        'scan-type': 'fs',
-                        'scan-ref': '.',
-                        format: 'json',
-                        output: 'trivy-results.json'
-                    }
-                }
+                name: 'Install Trivy',
+                command: `curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin`
+            },
+            {
+                name: 'Install CycloneDX SBOM Generator',
+                command: `npm install --save-dev @cyclonedx/cyclonedx-npm`
+            },
+            {
+                name: 'Generate SBOM (CycloneDX JSON)',
+                command: `npx cyclonedx-npm --output-format json > bom.json`
+            },
+            {
+                name: 'Run Trivy on SBOM (licenses + CVEs)',
+                command: `trivy sbom --scanners vuln,license --format json --output trivy-results.json bom.json`
             }
         ]
     },
-
     Jest: {
         steps: [
             {
@@ -156,5 +150,133 @@ echo "$results" > sprint_points.json
       `.trim()
             }
         ]
+    },
+    'Jira-Security-Epics': {
+        steps: [
+            {
+                name: 'Fetch Epics from JIRA',
+                command: `
+echo "Fetching epics from JIRA..."
+
+epics=$(curl -s -u \${{ secrets.JIRA_EMAIL }}:\${{ secrets.JIRA_TOKEN }} \\
+  -G --data-urlencode "jql=issuetype=Epic" \\
+  "\${{ secrets.JIRA_URL }}/rest/api/2/search?fields=key,summary,labels")
+
+echo "$epics" > epics.json
+      `.trim()
+            }
+        ]
+    },
+    'Jira-Security-Incidents': {
+        steps: [
+            {
+                name: 'Fetch Security Incidents Created During Sprint',
+                command: `
+echo "Fetching current active sprint..."
+
+active_sprint=$(curl -s -u \${{ secrets.JIRA_EMAIL }}:\${{ secrets.JIRA_TOKEN }} \\
+  "\${{ secrets.JIRA_URL }}/rest/agile/1.0/board/\${{ secrets.JIRA_BOARD }}/sprint?state=active" | jq '.values[0]')
+
+sprint_id=$(echo "$active_sprint" | jq -r '.id')
+sprint_name=$(echo "$active_sprint" | jq -r '.name')
+start_date=$(echo "$active_sprint" | jq -r '.startDate' | cut -d'T' -f1)
+end_date=$(echo "$active_sprint" | jq -r '.endDate' | cut -d'T' -f1)
+
+if [ -z "$start_date" ] || [ -z "$end_date" ]; then
+  echo "Sprint dates not found. Exiting early."
+  exit 1
+fi
+
+echo "Active sprint: $sprint_name (ID: $sprint_id)"
+echo "Start: $start_date"
+echo "End:   $end_date"
+
+echo "Fetching security incidents created during sprint timeframe..."
+
+incidents=$(curl -s -u \${{ secrets.JIRA_EMAIL }}:\${{ secrets.JIRA_TOKEN }} \\
+  -G --data-urlencode "jql=labels in (\\"security-incident\\", \\"vulnerability\\") AND created >= \\"$start_date\\" AND created <= \\"$end_date\\"" \\
+  "\${{ secrets.JIRA_URL }}/rest/api/2/search?fields=key,summary,created")
+
+echo "$incidents" > security_incidents.json
+      `.trim()
+            }
+        ]
+    },
+    'Jira-Defect-Density': {
+        steps: [
+            {
+                name: 'Fetch JIRA Bugs',
+                command: `
+echo "Fetching issues of type 'Bug' from JIRA..."
+bugs=$(curl -s -u \${{ secrets.JIRA_EMAIL }}:\${{ secrets.JIRA_TOKEN }} \\
+  -G --data-urlencode "jql=issuetype=Bug" \\
+  "\${{ secrets.JIRA_URL }}/rest/api/2/search?fields=key,summary,created")
+
+echo "$bugs" > jira_bugs.json
+      `.trim()
+            },
+            {
+                name: 'Count LOC for Defect Density',
+                command: `
+echo "Counting lines of code in ./src..."
+loc=$(find ./src -type f \\( -name '*.ts' -o -name '*.js' -o -name '*.tsx' -o -name '*.jsx' \\) | xargs wc -l | tail -n 1 | awk '{print $1}')
+kloc=$(echo "scale=2; $loc / 1000" | bc)
+
+echo "{ \\"loc\\": $loc, \\"kloc\\": $kloc }" > loc.json
+      `.trim()
+            }
+        ]
+    },
+    'Language-Impact': {
+        steps: [
+            {
+                name: 'Fetch Programming Language Breakdown',
+                command: `
+echo "Fetching language breakdown from GitHub API..."
+curl -s -H "Authorization: token \${{ secrets.GITHUB_TOKEN }}" \\
+  https://api.github.com/repos/\${{ github.repository }}/languages \\
+  -o languages.json
+            `.trim()
+            }
+        ]
+    },
+    'Depcheck': {
+        steps: [
+            {
+                name: 'Install Depcheck',
+                command: 'npm install -g depcheck'
+            },
+            {
+                name: 'Run Depcheck',
+                command: 'depcheck --json > depcheck-results.json || true'
+            }
+        ]
+    },
+    'ZAP': {
+        steps: [
+            {
+                name: 'Start Express App',
+                command: 'PORT={{PORT}} {{START_COMMAND}} &'
+            },
+            {
+                name: 'Wait for app to be ready',
+                command: 'sleep 10'
+            },
+            {
+                name: 'Run OWASP ZAP Baseline Scan',
+                command: `
+docker run -u root --network host \\
+  -v $(pwd):/zap/wrk/:rw \\
+  ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \\
+  -t http://localhost:{{PORT}} \\
+  -g zap-gen.conf \\
+  -r zap-report.html \\
+  -J zap-report.json \\
+  -z "-config api.disablekey=true"
+            `.trim(),
+                continueOnError: true
+            }
+        ]
     }
+
 };

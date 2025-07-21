@@ -36,13 +36,30 @@ export function generateGitHubActionsYaml(
     selectedTools: string[],
     repo: string,
     workingDir = '.',
-    branch = 'master'
+    branch = 'master',
+    port?: number,
+    startCommand?: string
 ): string {
     const allSteps: ToolStep[] = [];
 
     selectedTools.forEach(tool => {
-        const config = TOOL_MAP[tool];
+        let config = TOOL_MAP[tool];
         if (!config) return;
+
+        if (tool === 'ZAP') {
+            config = JSON.parse(JSON.stringify(config)); // deep clone
+            config.steps = config.steps.map((step) => {
+                if (typeof step.command === 'string') {
+                    return {
+                        ...step,
+                        command: step.command
+                            .replace(/{{PORT}}/g, String(port ?? 8080))
+                            .replace(/{{START_COMMAND}}/g, startCommand ?? 'npm run start'),
+                    };
+                }
+                return step;
+            });
+        }
 
         if (tool === 'GitLeaks') {
             allSteps.push(...config.steps.slice(0, 1));
@@ -105,6 +122,77 @@ export function generateGitHubActionsYaml(
   --data @sprint_points.json`
             });
         }
+
+        if (tool === 'Jira-Security-Epics') {
+            allSteps.push({
+                name: 'Send Epics to API',
+                command: `curl -X POST ${NGROK_URL}/api/metrics \\
+  -H 'Content-Type: application/json' \\
+  -H 'X-Tool-Name: Jira-Security-Epics' \\
+  -H 'X-Repo-Name: ${repo}' \\
+  --data @epics.json`
+            });
+        }
+
+        if (tool === 'Jira-Security-Incidents') {
+            allSteps.push({
+                name: 'Send Security Incidents to API',
+                command: `curl -X POST ${NGROK_URL}/api/metrics \\
+  -H 'Content-Type: application/json' \\
+  -H 'X-Tool-Name: Jira-Security-Incidents' \\
+  -H 'X-Repo-Name: ${repo}' \\
+  --data @security_incidents.json`
+            });
+        }
+
+        if (tool === 'Jira-Defect-Density') {
+            allSteps.push({
+                name: 'Merge Defect Density Inputs',
+                command: `jq -s '.[0] * .[1]' jira_bugs.json loc.json > defect_density.json`
+            });
+
+            allSteps.push({
+                name: 'Send Defect Density Data to API',
+                command: `curl -X POST ${NGROK_URL}/api/metrics \\
+  -H 'Content-Type: application/json' \\
+  -H 'X-Tool-Name: Jira-Defect-Density' \\
+  -H 'X-Repo-Name: ${repo}' \\
+  --data @defect_density.json`
+            });
+        }
+
+        if (tool === 'Language-Impact') {
+            allSteps.push({
+                name: 'Send Language Energy Impact to API',
+                command: `curl -X POST ${NGROK_URL}/api/metrics \\
+  -H 'Content-Type: application/json' \\
+  -H 'X-Tool-Name: Language-Impact' \\
+  -H 'X-Repo-Name: ${repo}' \\
+  --data @languages.json`
+            });
+        }
+
+        if (tool === 'Depcheck') {
+            allSteps.push({
+                name: 'Send Depcheck results to API',
+                command: `curl -X POST ${NGROK_URL}/api/metrics \\
+  -H 'Content-Type: application/json' \\
+  -H 'X-Tool-Name: Depcheck' \\
+  -H 'X-Repo-Name: ${repo}' \\
+  --data @depcheck-results.json`
+            });
+        }
+
+        else if (tool === 'ZAP') {
+            allSteps.push({
+                name: 'Send ZAP results to API',
+                command: `curl -X POST ${NGROK_URL}/api/metrics \\
+  -H 'Content-Type: application/json' \\
+  -H 'X-Tool-Name: ZAP' \\
+  -H 'X-Repo-Name: ${repo}' \\
+  --data @zap-report.json`
+            });
+        }
     });
 
     const stepsYaml = allSteps
@@ -113,7 +201,7 @@ export function generateGitHubActionsYaml(
                 const dedented = typeof step.command === 'string' ? dedent(step.command) : '';
                 const indentedCommand = dedented
                     .split('\n')
-                    .map(line => `          ${line}`)  // 10 spaces here (6 for step + 2 for run: + 2 extra)
+                    .map(line => `          ${line}`)
                     .join('\n');
 
                 const continueOnError = step.continueOnError ? '\n        continue-on-error: true' : '';
