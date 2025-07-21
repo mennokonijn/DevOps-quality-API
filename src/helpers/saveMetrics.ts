@@ -1,5 +1,6 @@
 import {Pool} from "pg";
 import {WHOAMI} from "../config/env";
+import {calculateWeightedEnergy} from "../utils/calculateEnergy";
 
 const pool = new Pool({
     user: WHOAMI,
@@ -274,7 +275,6 @@ export const saveMetrics = async (repo: string, tool: string, req: any) => {
 
     else if (tool === 'Jira-Security-Incidents') {
         const issues = req.body?.issues ?? [];
-        console.log(req.body)
         const incidentCount = issues.length;
 
         await client.query(
@@ -289,7 +289,45 @@ export const saveMetrics = async (repo: string, tool: string, req: any) => {
         console.log(`Saved ${incidentCount} security incidents during sprint for "${repo}"`);
     }
 
+    else if (tool === 'Jira-Defect-Density') {
+        const issues = req.body?.issues ?? [];
+        const kloc = req.body?.kloc;
 
+        const bugCount = issues.length;
+
+        let defectDensity: number | null = null;
+        if (typeof kloc === 'number' && kloc > 0) {
+            defectDensity = parseFloat((bugCount / kloc).toFixed(2));
+        }
+
+        await client.query(
+            `INSERT INTO operate_monitor_metrics (
+            scan_id, defect_density
+        ) VALUES ($1, $2)
+        ON CONFLICT (scan_id) DO UPDATE
+        SET defect_density = EXCLUDED.defect_density;`,
+            [scanId, defectDensity]
+        );
+
+        console.log(`Saved defect density for repository "${repo}": ${bugCount} bugs / ${kloc} KLOC = ${defectDensity}`);
+    }
+
+    else if (tool === 'Language-Impact') {
+        const languages = req.body ?? {};
+        const energy = calculateWeightedEnergy(languages);
+
+        console.log(energy);
+
+        await client.query(
+            `INSERT INTO code_metrics (scan_id, programming_language_impact)
+         VALUES ($1, $2)
+         ON CONFLICT (scan_id) DO UPDATE
+         SET programming_language_impact = EXCLUDED.programming_language_impact;`,
+            [scanId, energy]
+        );
+
+        console.log(`Saved language energy impact (${energy} J) for repo "${repo}"`);
+    }
 
     client.release();
 }

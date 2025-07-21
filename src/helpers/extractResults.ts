@@ -62,7 +62,8 @@ export const extractResults = async (repoName: any): Promise<Record<string, any>
                 { name: 'Cyclomatic Complexity', value: c.cyclomatic_complexity?.toString() ?? '-' },
                 { name: 'Cognitive Complexity', value: c.cognitive_complexity?.toString() ?? '-' },
                 { name: 'Code Smells', value: c.code_smells?.toString() ?? '-' },
-                { name: 'Duplicated Lines Density', value: c.duplicated_lines_density?.toString() ?? '-' }
+                { name: 'Duplicated Lines Density', value: c.duplicated_lines_density?.toString() ?? '-' },
+                { name: 'Programming Language Energy Impact', value: c.programming_language_impact?.toString() ?? '-' }
             );
         }
 
@@ -141,6 +142,7 @@ export const extractResults = async (repoName: any): Promise<Record<string, any>
             const o = OperateMonitorMetrics.rows[0];
             scan.OperateMonitor.push(
                 { name: 'Security Incidents', value: (o.security_incidents ? Number(o.security_incidents || 0).toFixed(1) : '-') },
+                { name: 'Defect Density', value : (o.defect_density ? Number(o.defect_density || 0).toFixed(1) + '%' : '-') }
             );
         }
 

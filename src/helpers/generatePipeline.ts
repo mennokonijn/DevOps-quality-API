@@ -40,6 +40,8 @@ export function generateGitHubActionsYaml(
 ): string {
     const allSteps: ToolStep[] = [];
 
+    console.log('Selected tools:', selectedTools);
+
     selectedTools.forEach(tool => {
         const config = TOOL_MAP[tool];
         if (!config) return;
@@ -125,6 +127,33 @@ export function generateGitHubActionsYaml(
   -H 'X-Tool-Name: Jira-Security-Incidents' \\
   -H 'X-Repo-Name: ${repo}' \\
   --data @security_incidents.json`
+            });
+        }
+
+        if (tool === 'Jira-Defect-Density') {
+            allSteps.push({
+                name: 'Merge Defect Density Inputs',
+                command: `jq -s '.[0] * .[1]' jira_bugs.json loc.json > defect_density.json`
+            });
+
+            allSteps.push({
+                name: 'Send Defect Density Data to API',
+                command: `curl -X POST ${NGROK_URL}/api/metrics \\
+  -H 'Content-Type: application/json' \\
+  -H 'X-Tool-Name: Jira-Defect-Density' \\
+  -H 'X-Repo-Name: ${repo}' \\
+  --data @defect_density.json`
+            });
+        }
+
+        if (tool === 'Language-Impact') {
+            allSteps.push({
+                name: 'Send Language Energy Impact to API',
+                command: `curl -X POST ${NGROK_URL}/api/metrics \\
+  -H 'Content-Type: application/json' \\
+  -H 'X-Tool-Name: Language-Impact' \\
+  -H 'X-Repo-Name: ${repo}' \\
+  --data @languages.json`
             });
         }
     });

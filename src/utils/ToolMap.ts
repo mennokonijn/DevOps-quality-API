@@ -201,5 +201,43 @@ echo "$incidents" > security_incidents.json
       `.trim()
             }
         ]
+    },
+    'Jira-Defect-Density': {
+        steps: [
+            {
+                name: 'Fetch JIRA Bugs',
+                command: `
+echo "Fetching issues of type 'Bug' from JIRA..."
+bugs=$(curl -s -u \${{ secrets.JIRA_EMAIL }}:\${{ secrets.JIRA_TOKEN }} \\
+  -G --data-urlencode "jql=issuetype=Bug" \\
+  "\${{ secrets.JIRA_URL }}/rest/api/2/search?fields=key,summary,created")
+
+echo "$bugs" > jira_bugs.json
+      `.trim()
+            },
+            {
+                name: 'Count LOC for Defect Density',
+                command: `
+echo "Counting lines of code in ./src..."
+loc=$(find ./src -type f \\( -name '*.ts' -o -name '*.js' -o -name '*.tsx' -o -name '*.jsx' \\) | xargs wc -l | tail -n 1 | awk '{print $1}')
+kloc=$(echo "scale=2; $loc / 1000" | bc)
+
+echo "{ \\"loc\\": $loc, \\"kloc\\": $kloc }" > loc.json
+      `.trim()
+            }
+        ]
+    },
+    'Language-Impact': {
+        steps: [
+            {
+                name: 'Fetch Programming Language Breakdown',
+                command: `
+echo "Fetching language breakdown from GitHub API..."
+curl -s -H "Authorization: token \${{ secrets.GITHUB_TOKEN }}" \\
+  https://api.github.com/repos/\${{ github.repository }}/languages \\
+  -o languages.json
+            `.trim()
+            }
+        ]
     }
 };
