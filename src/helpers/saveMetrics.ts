@@ -372,7 +372,71 @@ export const saveMetrics = async (repo: string, tool: string, req: any) => {
         console.log(`Saved ZAP alerts for "${repo}"`);
     }
 
+    else if (tool === 'Deployment-Frequency') {
+        const deployments = req.body ?? [];
 
+        if (!Array.isArray(deployments) || deployments.length === 0) {
+            console.warn(`No deployment frequency data received for "${repo}"`);
+            return;
+        }
+
+        // Only use data from the past 7 days
+        const now = new Date();
+        const pastWeekData = deployments.filter((d: any) => {
+            const date = new Date(d.date);
+            const diffDays = (now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24);
+            return diffDays <= 7;
+        });
+
+        const totalDeploys = pastWeekData.reduce((sum, d) => sum + d.count, 0);
+        const distinctDays = pastWeekData.length;
+
+        const avgPerDay = distinctDays > 0 ? totalDeploys / distinctDays : 0;
+
+        await client.query(
+            `INSERT INTO deploy_release_metrics (scan_id, deployment_frequency)
+     VALUES ($1, $2)
+     ON CONFLICT (scan_id) DO UPDATE
+     SET deployment_frequency = EXCLUDED.deployment_frequency;`,
+            [scanId, avgPerDay]
+        );
+
+        console.log(`Saved average deployment frequency (${avgPerDay.toFixed(2)} per day over ${distinctDays} day(s)) for "${repo}"`);
+    }
+
+    else if (tool === 'Deployment-Time') {
+        const data = req.body ?? [];
+
+        const total = data.reduce((sum: number, d: any) => sum + (d.lead_time_hours || 0), 0);
+        const avg = data.length > 0 ? total / data.length : null;
+
+        await client.query(
+            `INSERT INTO deploy_release_metrics (scan_id, deployment_time)
+     VALUES ($1, $2)
+     ON CONFLICT (scan_id) DO UPDATE
+     SET deployment_time = EXCLUDED.deployment_time;`,
+            [scanId, avg]
+        );
+
+        console.log(`Saved average deployment time (${avg?.toFixed(2)} hrs) for "${repo}"`);
+    }
+
+    else if (tool === 'MTTR') {
+        const incidents = req.body ?? [];
+
+        const total = incidents.reduce((sum: number, d: any) => sum + (d.mttr_minutes || 0), 0);
+        const avg = incidents.length > 0 ? total / incidents.length : null;
+
+        await client.query(
+            `INSERT INTO operate_monitor_metrics (scan_id, mttr)
+     VALUES ($1, $2)
+     ON CONFLICT (scan_id) DO UPDATE
+     SET mttr = EXCLUDED.mttr;`,
+            [scanId, avg]
+        );
+
+        console.log(`Saved MTTR (${avg?.toFixed(2)} minutes) for "${repo}"`);
+    }
 
     client.release();
 }

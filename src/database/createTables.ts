@@ -95,7 +95,6 @@ const createTables = async () => {
         id SERIAL PRIMARY KEY,
         scan_id INTEGER UNIQUE REFERENCES scans(id) ON DELETE CASCADE,
         deployment_time NUMERIC,
-        change_time NUMERIC,
         deployment_frequency NUMERIC,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
