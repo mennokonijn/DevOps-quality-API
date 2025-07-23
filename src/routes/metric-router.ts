@@ -28,7 +28,7 @@ router.post('/metrics', async (req, res) => {
         await saveMetrics(repo, tool, req);
         res.status(200).json({ message: `Metrics saved for tool "${tool}"` });
     } catch (err) {
-        console.error('❌ Failed to save metrics:', err);
+        console.error('Failed to save metrics:', err);
         res.status(500).json({ error: 'Failed to save metrics' });
     }
 });

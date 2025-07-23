@@ -1,23 +1,14 @@
 import express from 'express';
-import { Pool } from 'pg';
-import {WHOAMI} from "../config/env";
+import {pool} from "../database/createDatabase";
 
 const router = express.Router();
-
-const pool = new Pool({
-    user: WHOAMI,
-    host: 'localhost',
-    database: 'metrics_db',
-    password: 'postgres',
-    port: 5432,
-});
 
 router.get('/repos', async (req, res) => {
     const client = await pool.connect();
 
     try {
         const result = await client.query(`
-        SELECT name FROM repositories ORDER BY name ASC;
+        SELECT id, name FROM repositories ORDER BY name ASC;
     `);
         res.status(200).json(result.rows);
     } catch (error) {

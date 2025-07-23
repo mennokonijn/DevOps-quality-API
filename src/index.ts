@@ -6,6 +6,7 @@ import dotenv from 'dotenv'
 import {createDatabase} from "./database/createDatabase";
 import createTables from "./database/createTables";
 import repositoryRouter from "./routes/repository-router";
+import surveysRouter from "./routes/surveys-router";
 
 dotenv.config()
 
@@ -23,6 +24,7 @@ app.get('/api/health', (req: Request, res: Response) => {
 app.use('/api', metricRouter);
 app.use('/api', generateYamlRouter);
 app.use('/api', repositoryRouter);
+app.use('/api', surveysRouter);
 
 const startServer = async () => {
     try {

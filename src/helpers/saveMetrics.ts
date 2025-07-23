@@ -1,14 +1,6 @@
-import {Pool} from "pg";
-import {WHOAMI} from "../config/env";
 import {calculateWeightedEnergy} from "../utils/calculateEnergy";
+import {pool} from "../database/createDatabase";
 
-const pool = new Pool({
-    user: WHOAMI,
-    host: 'localhost',
-    database: 'metrics_db',
-    password: 'postgres',
-    port: 5432,
-})
 
 export const saveMetrics = async (repo: string, tool: string, req: any) => {
     const client = await pool.connect();

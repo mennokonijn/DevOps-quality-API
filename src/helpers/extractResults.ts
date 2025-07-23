@@ -1,13 +1,4 @@
-import {Pool} from "pg";
-import {WHOAMI} from "../config/env";
-
-const pool = new Pool({
-    user: WHOAMI,
-    host: 'localhost',
-    database: 'metrics_db',
-    password: 'postgres',
-    port: 5432,
-})
+import {pool} from "../database/createDatabase";
 
 type ZapAlert = {
     description: string;
@@ -219,6 +210,17 @@ export const extractResults = async (repoName: any): Promise<Record<string, Scan
 
 
         results.push(scan);
+    }
+
+    if (results.length === 0) {
+        results.push({
+            Plan: [],
+            Code: [],
+            Build: [],
+            Test: [],
+            DeployRelease: [],
+            OperateMonitor: [],
+        });
     }
 
     client.release();
