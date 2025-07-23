@@ -1,5 +1,13 @@
-import { Client } from 'pg';
+import {Client, Pool} from 'pg';
 import { WHOAMI} from "../config/env";
+
+export const pool = new Pool({
+    user: WHOAMI,
+    host: 'localhost',
+    database: 'metrics_db',
+    password: 'postgres',
+    port: 5432,
+})
 
 export const createDatabase = async (dbName: string) => {
     const client = new Client({

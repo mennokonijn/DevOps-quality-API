@@ -1,13 +1,4 @@
-import {Pool} from "pg";
-import {WHOAMI} from "../config/env";
-
-const pool = new Pool({
-    user: WHOAMI,
-    host: 'localhost',
-    database: 'metrics_db',
-    password: 'postgres',
-    port: 5432,
-})
+import {pool} from "../database/createDatabase";
 
 type ZapAlert = {
     description: string;
@@ -48,7 +39,7 @@ export const extractResults = async (repoName: any): Promise<Record<string, Scan
     for (const scanRow of scansRes.rows) {
         const scanId = scanRow.id;
 
-        const [codeRes, testRes, cveRes, planMetrics, gitleaksRes, outdatedRes, licenseRes, OperateMonitorMetrics, buildRes, zapAlertsRes] = await Promise.all([
+        const [codeRes, testRes, cveRes, planMetrics, gitleaksRes, outdatedRes, licenseRes, OperateMonitorMetrics, buildRes, zapAlertsRes, deployReleaseRes] = await Promise.all([
             client.query(`SELECT * FROM code_metrics WHERE scan_id = $1`, [scanId]),
             client.query(`SELECT * FROM test_metrics WHERE scan_id = $1`, [scanId]),
             client.query(`SELECT * FROM cve_vulnerabilities WHERE scan_id = $1`, [scanId]),
@@ -58,7 +49,8 @@ export const extractResults = async (repoName: any): Promise<Record<string, Scan
             client.query(`SELECT * FROM project_licenses WHERE scan_id = $1`, [scanId]),
             client.query(`SELECT * FROM operate_monitor_metrics WHERE scan_id = $1`, [scanId]),
             client.query(`SELECT * FROM build_metrics WHERE scan_id = $1`, [scanId]),
-            client.query(`SELECT * FROM zap_alerts WHERE scan_id = $1`, [scanId])
+            client.query(`SELECT * FROM zap_alerts WHERE scan_id = $1`, [scanId]),
+            client.query(`SELECT * FROM deploy_release_metrics WHERE scan_id = $1`, [scanId])
         ]);
 
 
@@ -193,13 +185,42 @@ export const extractResults = async (repoName: any): Promise<Record<string, Scan
             const o = OperateMonitorMetrics.rows[0];
             scan.OperateMonitor.push(
                 { name: 'Security Incidents', value: (o.security_incidents ? Number(o.security_incidents || 0).toFixed(1) : '-') },
-                { name: 'Defect Density', value : (o.defect_density ? Number(o.defect_density || 0).toFixed(1) + '%' : '-') }
+                { name: 'Defect Density', value : (o.defect_density ? Number(o.defect_density || 0).toFixed(1) + '%' : '-') },
+                { name: 'Mean Time to Recover (MTTR)', value: Number(o.mttr).toFixed(2) + ' minutes' }
             );
+        }
+
+        //Deploy release metrics
+        if (deployReleaseRes.rowCount) {
+            const d = deployReleaseRes.rows[0];
+            if (d.deployment_time !== null) {
+                scan.DeployRelease.push({
+                    name: 'Average Deployment Time',
+                    value: Number(d.deployment_time).toFixed(2) + ' hours',
+                });
+            }
+            if (d.deployment_frequency !== null) {
+                scan.DeployRelease.push({
+                    name: 'Average Deployment Frequency',
+                    value: Number(d.deployment_frequency).toFixed(2) + ' per day',
+                });
+            }
         }
 
 
 
         results.push(scan);
+    }
+
+    if (results.length === 0) {
+        results.push({
+            Plan: [],
+            Code: [],
+            Build: [],
+            Test: [],
+            DeployRelease: [],
+            OperateMonitor: [],
+        });
     }
 
     client.release();

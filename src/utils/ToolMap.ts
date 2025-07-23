@@ -277,6 +277,74 @@ docker run -u root --network host \\
                 continueOnError: true
             }
         ]
-    }
+    },
+    'Deployment-Frequency': {
+        steps: [
+            {
+                name: 'Calculate Deployment Frequency',
+                command: `
+jq -r '.[].created_at' deployments.json | cut -d'T' -f1 | sort | uniq -c |
+jq -Rn '
+  [inputs
+   | capture("(?<count>\\\\d+) (?<date>\\\\d{4}-\\\\d{2}-\\\\d{2})")
+   | {date: .date, count: (.count | tonumber)}]' > deployment_frequency.json
+        `.trim()
+            }
+        ]
+    },
 
+    'Deployment-Time': {
+        steps: [
+            {
+                name: 'Calculate Deployment Time',
+                command: `
+echo "[]" > deployment_time.json
+jq -c '.[]' deployments.json | while read -r deployment; do
+  sha=$(echo "$deployment" | jq -r '.sha')
+  deploy_time=$(echo "$deployment" | jq -r '.created_at')
+
+  commit_info=$(curl -s -H "Authorization: token \${{ secrets.GITHUB_TOKEN }}" \\
+    https://api.github.com/repos/\${{ github.repository }}/commits/$sha)
+  commit_time=$(echo "$commit_info" | jq -r '.commit.committer.date')
+
+  deploy_epoch=$(date -d "$deploy_time" +%s)
+  commit_epoch=$(date -d "$commit_time" +%s)
+  lead_time_sec=$((deploy_epoch - commit_epoch))
+  lead_time_hr=$(echo "scale=2; $lead_time_sec / 3600" | bc)
+
+  jq --arg sha "$sha" --argjson hrs "$lead_time_hr" \\
+    '. += [{"sha": $sha, "lead_time_hours": $hrs}]' deployment_time.json > tmp.json && mv tmp.json deployment_time.json
+done
+        `.trim()
+            }
+        ]
+    },
+
+    'MTTR': {
+        steps: [
+            {
+                name: 'Calculate MTTR',
+                command: `
+echo "[]" > mttr.json
+jq -r '.[].id' deployments.json | while read -r id; do
+  statuses=$(curl -s -H "Authorization: token \${{ secrets.GITHUB_TOKEN }}" \\
+    https://api.github.com/repos/\${{ github.repository }}/deployments/$id/statuses)
+
+  failed=$(echo "$statuses" | jq -r '[.[] | select(.state == "failure")][0].created_at')
+  success=$(echo "$statuses" | jq -r '[.[] | select(.state == "success")][0].created_at')
+
+  if [[ "$failed" != "null" && "$success" != "null" ]]; then
+    fail_epoch=$(date -d "$failed" +%s)
+    success_epoch=$(date -d "$success" +%s)
+    delta=$((success_epoch - fail_epoch))
+    minutes=$(echo "scale=2; $delta / 60" | bc)
+
+    jq --arg id "$id" --argjson m "$minutes" \\
+      '. += [{"deployment_id": $id, "mttr_minutes": $m}]' mttr.json > tmp.json && mv tmp.json mttr.json
+  fi
+done
+        `.trim()
+            }
+        ]
+    }
 };

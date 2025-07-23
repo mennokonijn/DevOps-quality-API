@@ -37,10 +37,37 @@ export function generateGitHubActionsYaml(
     repo: string,
     workingDir = '.',
     branch = 'master',
+    deploymentName: string,
     port?: number,
-    startCommand?: string
+    startCommand?: string,
 ): string {
     const allSteps: ToolStep[] = [];
+
+    const needsDeploymentData = selectedTools.some(tool =>
+        ['Deployment-Frequency', 'Deployment-Time', 'MTTR'].includes(tool)
+    );
+
+    if (needsDeploymentData) {
+        allSteps.push(
+            {
+                name: 'Fetch Deployment Events from GitHub API',
+                command: `
+curl -s -H "Authorization: token \${{ secrets.GITHUB_TOKEN }}" \\
+  https://api.github.com/repos/\${{ github.repository }}/deployments \\
+  > deployments.json
+      `.trim()
+            },
+            {
+                name: 'Fetch Workflow Runs (for MTTR)',
+                command: `
+curl -s -H "Authorization: token \${{ secrets.GITHUB_TOKEN }}" \\
+  "https://api.github.com/repos/\${{ github.repository }}/actions/runs?branch=master&status=completed" \\
+  | jq '[.workflow_runs[] | select(.name == "Simulate Deployment History")]' \\
+  > workflow_runs.json
+      `.trim()
+            }
+        );
+    }
 
     selectedTools.forEach(tool => {
         let config = TOOL_MAP[tool];
@@ -54,7 +81,8 @@ export function generateGitHubActionsYaml(
                         ...step,
                         command: step.command
                             .replace(/{{PORT}}/g, String(port ?? 8080))
-                            .replace(/{{START_COMMAND}}/g, startCommand ?? 'npm run start'),
+                            .replace(/{{START_COMMAND}}/g, startCommand ?? 'npm run start')
+                            .replace(/{{DEPLOYMENT_NAME}}/g, deploymentName)
                     };
                 }
                 return step;
@@ -191,6 +219,39 @@ export function generateGitHubActionsYaml(
   -H 'X-Tool-Name: ZAP' \\
   -H 'X-Repo-Name: ${repo}' \\
   --data @zap-report.json`
+            });
+        }
+
+        else if (tool === 'Deployment-Frequency') {
+            allSteps.push({
+                name: 'Send Deployment Frequency to API',
+                command: `curl -X POST ${NGROK_URL}/api/metrics \\
+  -H 'Content-Type: application/json' \\
+  -H 'X-Tool-Name: Deployment-Frequency' \\
+  -H 'X-Repo-Name: ${repo}' \\
+  --data @deployment_frequency.json`
+            });
+        }
+
+        else if (tool === 'Deployment-Time') {
+            allSteps.push({
+                name: 'Send Deployment Time to API',
+                command: `curl -X POST ${NGROK_URL}/api/metrics \\
+  -H 'Content-Type: application/json' \\
+  -H 'X-Tool-Name: Deployment-Time' \\
+  -H 'X-Repo-Name: ${repo}' \\
+  --data @deployment_time.json`
+            });
+        }
+
+        else if (tool === 'MTTR') {
+            allSteps.push({
+                name: 'Send MTTR to API',
+                command: `curl -X POST ${NGROK_URL}/api/metrics \\
+  -H 'Content-Type: application/json' \\
+  -H 'X-Tool-Name: MTTR' \\
+  -H 'X-Repo-Name: ${repo}' \\
+  --data @mttr.json`
             });
         }
     });
