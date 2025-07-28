@@ -38,8 +38,15 @@ export function generateGitHubActionsYaml(
     workingDir = '.',
     branch = 'master',
     deploymentName: string,
+    nodeVersion: string,
     port?: number,
     startCommand?: string,
+    securityIncidentLabel: string = 'Security Incident',
+    completionLabel: string = 'Done',
+    jiraEmail: string = '',
+    jiraBoardId: string = '',
+    jiraUrl: string = '',
+    sonarqubeMetrics: string = ''
 ): string {
     const allSteps: ToolStep[] = [];
 
@@ -73,21 +80,25 @@ curl -s -H "Authorization: token \${{ secrets.GITHUB_TOKEN }}" \\
         let config = TOOL_MAP[tool];
         if (!config) return;
 
-        if (tool === 'ZAP') {
-            config = JSON.parse(JSON.stringify(config)); // deep clone
-            config.steps = config.steps.map((step) => {
-                if (typeof step.command === 'string') {
-                    return {
-                        ...step,
-                        command: step.command
-                            .replace(/{{PORT}}/g, String(port ?? 8080))
-                            .replace(/{{START_COMMAND}}/g, startCommand ?? 'npm run start')
-                            .replace(/{{DEPLOYMENT_NAME}}/g, deploymentName)
-                    };
-                }
-                return step;
-            });
-        }
+        config = JSON.parse(JSON.stringify(config));
+        config.steps = config.steps.map((step) => {
+            if (typeof step.command === 'string') {
+                return {
+                    ...step,
+                    command: step.command
+                        .replace(/{{PORT}}/g, String(port ?? 8080))
+                        .replace(/{{START_COMMAND}}/g, startCommand ?? 'npm run start')
+                        .replace(/{{DEPLOYMENT_NAME}}/g, deploymentName)
+                        .replace(/{{SECURITY_INCIDENT_LABEL}}/g, securityIncidentLabel)
+                        .replace(/{{JIRA_EMAIL}}/g, jiraEmail)
+                        .replace(/{{JIRA_BOARD}}/g, jiraBoardId )
+                        .replace(/{{JIRA_URL}}/g, jiraUrl)
+                        .replace(/{{SONARQUBE_METRIC_KEYS}}/g, sonarqubeMetrics)
+                        .replace(/{{COMPLETION_LABEL}}/g, completionLabel)
+                };
+            }
+            return step;
+        });
 
         if (tool === 'GitLeaks') {
             allSteps.push(...config.steps.slice(0, 1));
@@ -308,7 +319,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: ${nodeVersion}
 
       - name: Install dependencies
         run: npm install

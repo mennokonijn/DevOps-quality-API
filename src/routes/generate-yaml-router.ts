@@ -5,7 +5,7 @@ import {pool} from "../database/createDatabase";
 const router = express.Router();
 
 router.post('/generate-yaml', async (req, res) => {
-    let { tools, repo, branch, directory, port, startCommand, deploymentName } = req.body;
+    let { tools, repo, branch, directory, port, startCommand, deploymentName, nodeVersion, securityIncidentLabel, completionLabel, jiraEmail, jiraBoardId, jiraUrl, sonarQubeMetrics } = req.body;
     if (!tools || !repo || !branch) {
         return res.status(400).json({ error: 'language, metrics, and repo are required' });
     }
@@ -16,15 +16,22 @@ router.post('/generate-yaml', async (req, res) => {
 
     const client = await pool.connect();
 
-    const yaml = generateGitHubActionsYaml(tools, repo, directory, branch, deploymentName, port, startCommand);
+    const yaml = generateGitHubActionsYaml(tools, repo, directory, branch, deploymentName, nodeVersion, port, startCommand, securityIncidentLabel, completionLabel, jiraEmail, jiraBoardId, jiraUrl, sonarQubeMetrics);
 
     const repoMatch = repo.match(/github\.com[:/](.+?\/.+?)(?:\.git)?$/);
     const repoName = repoMatch ? repoMatch[1] : repo;
 
-    await client.query(
-        `INSERT INTO repositories (name) VALUES ($1) RETURNING id`,
+    const existing = await client.query(
+        `SELECT id FROM repositories WHERE name = $1`,
         [repoName]
     );
+
+    if (existing.rows.length <= 0) {
+        await client.query(
+            `INSERT INTO repositories (name) VALUES ($1) RETURNING id`,
+            [repoName]
+        );
+    }
 
     res.json({ yaml });
 });
