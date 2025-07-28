@@ -67,9 +67,9 @@ export const extractResults = async (repoName: any): Promise<Record<string, Scan
         if (codeRes.rowCount) {
             const c = codeRes.rows[0];
             scan.Code.push(
-                { name: 'Cyclomatic Complexity', value: c.cyclomatic_complexity?.toString() ?? '-' },
-                { name: 'Cognitive Complexity', value: c.cognitive_complexity?.toString() ?? '-' },
-                { name: 'Code Smells', value: c.code_smells?.toString() ?? '-' },
+                { name: 'Average Cyclomatic Complexity per function', value: c.cyclomatic_complexity?.toString() ?? '-' },
+                { name: 'Average Cognitive Complexity per function', value: c.cognitive_complexity?.toString() ?? '-' },
+                { name: 'Code Smells per KLOC', value: c.code_smells?.toString() ?? '-' },
                 { name: 'Duplicated Lines Density', value: c.duplicated_lines_density?.toString() ?? '-' },
                 { name: 'Programming Language Energy Impact', value: c.programming_language_impact?.toString() ?? '-' }
             );
@@ -77,8 +77,10 @@ export const extractResults = async (repoName: any): Promise<Record<string, Scan
 
         if (buildRes.rowCount) {
             const b = buildRes.rows[0];
-            const unused = b.unused_libraries
-                ? b.unused_libraries.split(',').map((s: string) => s.trim()).filter(Boolean)
+            const rawUnused = b.unused_libraries?.trim();
+
+            const unused = rawUnused && rawUnused.toLowerCase() !== 'null'
+                ? rawUnused.split(',').map((s: string) => s.trim()).filter(Boolean)
                 : [];
 
             const value = unused.length
@@ -87,10 +89,9 @@ export const extractResults = async (repoName: any): Promise<Record<string, Scan
 
             scan.Build.push({
                 name: 'Unused Libraries',
-                value: value
+                value
             });
         }
-
 
         // Library Freshness
         if (outdatedRes.rowCount) {
@@ -100,7 +101,7 @@ export const extractResults = async (repoName: any): Promise<Record<string, Scan
             ).join('\n');
 
             scan.Code.push({
-                name: 'Library Freshness (Outdated Packages)',
+                name: 'Outdated Packages',
                 value: `Outdated Libraries: ${total}\n${list}`,
             });
         }
@@ -173,7 +174,7 @@ export const extractResults = async (repoName: any): Promise<Record<string, Scan
         if (planMetrics.rowCount) {
             const p = planMetrics.rows[0];
             scan.Plan.push(
-                { name: 'Latest sprint velocity', value: (p.estimated_vs_completed_story_points ? Number(p.estimated_vs_completed_story_points || 0).toFixed(1) + '%' : '-') }
+                { name: 'Completion Rate', value: (p.estimated_vs_completed_story_points ? Number(p.estimated_vs_completed_story_points || 0).toFixed(1) + '%' : '-') }
             );
             scan.Plan.push(
                 { name: 'Security Requirements Coverage', value : (p.security_requirements_coverage ? Number(p.security_requirements_coverage || 0).toFixed(1) + '%' : '-') }
@@ -185,8 +186,8 @@ export const extractResults = async (repoName: any): Promise<Record<string, Scan
             const o = OperateMonitorMetrics.rows[0];
             scan.OperateMonitor.push(
                 { name: 'Security Incidents', value: (o.security_incidents ? Number(o.security_incidents || 0).toFixed(1) : '-') },
-                { name: 'Defect Density', value : (o.defect_density ? Number(o.defect_density || 0).toFixed(1) + '%' : '-') },
-                { name: 'Mean Time to Recover (MTTR)', value: Number(o.mttr).toFixed(2) + ' minutes' }
+                { name: 'Defect Density per KLOC', value : (o.defect_density ? Number(o.defect_density || 0).toFixed(1) : '-') },
+                { name: 'Mean Time to Recover (MTTR)', value: Number(o.mttr).toFixed(2) + ' hours' }
             );
         }
 

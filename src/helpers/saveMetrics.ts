@@ -54,8 +54,36 @@ export const saveMetrics = async (repo: string, tool: string, req: any) => {
         const cognitive = getValue('cognitive_complexity');
         const codeSmells = getValue('code_smells');
         const duplication = getValue('duplicated_lines_density');
-
         const coverage = getValue('coverage');
+
+        const functionsNr = getValue('functions');
+        const ncloc = getValue('ncloc');
+
+        console.log(ncloc)
+
+        const smellDensity = (
+            typeof codeSmells === 'number' &&
+            typeof ncloc === 'number' &&
+            ncloc > 0
+        )
+            ? parseFloat(((codeSmells / ncloc) * 1000).toFixed(2))
+            : null;
+
+        const normalizedCyclomatic = (
+            typeof cyclomatic === 'number' &&
+            typeof functionsNr === 'number' &&
+            functionsNr > 0
+        )
+            ? parseFloat((cyclomatic / functionsNr).toFixed(2))
+            : null;
+
+        const normalizedCognitive = (
+            typeof cognitive === 'number' &&
+            typeof functionsNr === 'number' &&
+            functionsNr > 0
+        )
+            ? parseFloat((cognitive / functionsNr).toFixed(2))
+            : null;
 
         await client.query(
             `INSERT INTO code_metrics (
@@ -68,7 +96,7 @@ export const saveMetrics = async (repo: string, tool: string, req: any) => {
             cognitive_complexity = EXCLUDED.cognitive_complexity,
             code_smells = EXCLUDED.code_smells,
             duplicated_lines_density = EXCLUDED.duplicated_lines_density;`,
-            [scanId, cyclomatic, cognitive, codeSmells, duplication]
+            [scanId, normalizedCyclomatic, normalizedCognitive, smellDensity, duplication]
         );
 
         await client.query(
@@ -308,8 +336,6 @@ export const saveMetrics = async (repo: string, tool: string, req: any) => {
         const languages = req.body ?? {};
         const energy = calculateWeightedEnergy(languages);
 
-        console.log(energy);
-
         await client.query(
             `INSERT INTO code_metrics (scan_id, programming_language_impact)
          VALUES ($1, $2)
@@ -417,17 +443,18 @@ export const saveMetrics = async (repo: string, tool: string, req: any) => {
         const incidents = req.body ?? [];
 
         const total = incidents.reduce((sum: number, d: any) => sum + (d.mttr_minutes || 0), 0);
-        const avg = incidents.length > 0 ? total / incidents.length : null;
+        const avgMinutes = incidents.length > 0 ? total / incidents.length : null;
+        const avgHours = avgMinutes !== null ? avgMinutes / 60 : null;
 
         await client.query(
             `INSERT INTO operate_monitor_metrics (scan_id, mttr)
-     VALUES ($1, $2)
-     ON CONFLICT (scan_id) DO UPDATE
-     SET mttr = EXCLUDED.mttr;`,
-            [scanId, avg]
+         VALUES ($1, $2)
+         ON CONFLICT (scan_id) DO UPDATE
+         SET mttr = EXCLUDED.mttr;`,
+            [scanId, avgHours]
         );
 
-        console.log(`Saved MTTR (${avg?.toFixed(2)} minutes) for "${repo}"`);
+        console.log(`Saved MTTR (${avgHours?.toFixed(2)} hours) for "${repo}"`);
     }
 
     client.release();

@@ -1,13 +1,5 @@
 import {ToolConfig} from "../helpers/generatePipeline";
 
-const SONARQUBE_METRIC_KEYS = [
-    'code_smells',
-    'complexity',
-    'cognitive_complexity',
-    'duplicated_lines_density',
-    'coverage'
-];
-
 export const TOOL_MAP: Record<string, ToolConfig> = {
     SonarQube: {
         steps: [
@@ -36,7 +28,7 @@ done`
             {
                 name: 'Fetch SonarQube Metrics',
                 command: `curl -s -u \${{ secrets.SONAR_TOKEN }}: \\
-  "\${{ secrets.SONAR_HOST_URL }}/api/measures/component?component=\${{ secrets.SONAR_PROJECT_KEY }}&metricKeys=${SONARQUBE_METRIC_KEYS.join(',')}" \\
+  "\${{ secrets.SONAR_HOST_URL }}/api/measures/component?component=\${{ secrets.SONAR_PROJECT_KEY }}&metricKeys={{SONARQUBE_METRIC_KEYS}}" \\
   -o sonar-results.json`
             }
         ]
@@ -104,8 +96,8 @@ STORY_POINTS_FIELD="customfield_10016"
 echo "Using Story Points field: $STORY_POINTS_FIELD"
 
 echo "Fetching completed sprints..."
-completed_sprints=$(curl -s -u \${{ secrets.JIRA_EMAIL }}:\${{ secrets.JIRA_TOKEN }} \\
-  "\${{ secrets.JIRA_URL }}/rest/agile/1.0/board/\${{ secrets.JIRA_BOARD }}/sprint?state=closed" | jq '.values')
+completed_sprints=$(curl -s -u {{JIRA_EMAIL}}:\${{ secrets.JIRA_TOKEN }} \\
+  "{{JIRA_URL}}/rest/agile/1.0/board/{{JIRA_BOARD}}/sprint?state=closed" | jq '.values')
 
 echo "$completed_sprints" > sprints.json
 
@@ -121,10 +113,10 @@ for row in $(echo "$completed_sprints" | jq -r '.[] | @base64'); do
   sprint_name=$(_jq '.name')
 
   echo "Sprint: $sprint_name (ID: $sprint_id)"
-  issues_url="\${{ secrets.JIRA_URL }}/rest/agile/1.0/sprint/$sprint_id/issue"
+  issues_url="{{JIRA_URL}}/rest/agile/1.0/sprint/$sprint_id/issue"
   echo "Fetching issues from: $issues_url"
 
-  issues_response=$(curl -s -u \${{ secrets.JIRA_EMAIL }}:\${{ secrets.JIRA_TOKEN }} "$issues_url")
+  issues_response=$(curl -s -u {{JIRA_EMAIL}}:\${{ secrets.JIRA_TOKEN }} "$issues_url")
   echo "$issues_response" > issues_raw.json
 
   issues=$(echo "$issues_response" | jq '.issues')
@@ -137,7 +129,7 @@ for row in $(echo "$completed_sprints" | jq -r '.[] | @base64'); do
     status=$(echo "$issue" | jq -r ".fields.status.name")
 
     total_estimated=$(echo "$total_estimated + $estimate" | bc)
-    if [[ "$status" == "Gereed" ]]; then
+    if [[ "$status" == "{{COMPLETION_LABEL}}" ]]; then
       total_completed=$(echo "$total_completed + $estimate" | bc)
     fi
   done < <(echo "$issues" | jq -c '.[]')
@@ -158,9 +150,9 @@ echo "$results" > sprint_points.json
                 command: `
 echo "Fetching epics from JIRA..."
 
-epics=$(curl -s -u \${{ secrets.JIRA_EMAIL }}:\${{ secrets.JIRA_TOKEN }} \\
+epics=$(curl -s -u {{JIRA_EMAIL}}:\${{ secrets.JIRA_TOKEN }} \\
   -G --data-urlencode "jql=issuetype=Epic" \\
-  "\${{ secrets.JIRA_URL }}/rest/api/2/search?fields=key,summary,labels")
+  "{{JIRA_URL}}/rest/api/2/search?fields=key,summary,labels")
 
 echo "$epics" > epics.json
       `.trim()
@@ -174,8 +166,8 @@ echo "$epics" > epics.json
                 command: `
 echo "Fetching current active sprint..."
 
-active_sprint=$(curl -s -u \${{ secrets.JIRA_EMAIL }}:\${{ secrets.JIRA_TOKEN }} \\
-  "\${{ secrets.JIRA_URL }}/rest/agile/1.0/board/\${{ secrets.JIRA_BOARD }}/sprint?state=active" | jq '.values[0]')
+active_sprint=$(curl -s -u {{JIRA_EMAIL}}:\${{ secrets.JIRA_TOKEN }} \\
+  "{{JIRA_URL}}/rest/agile/1.0/board/{{JIRA_BOARD}}/sprint?state=active" | jq '.values[0]')
 
 sprint_id=$(echo "$active_sprint" | jq -r '.id')
 sprint_name=$(echo "$active_sprint" | jq -r '.name')
@@ -193,9 +185,9 @@ echo "End:   $end_date"
 
 echo "Fetching security incidents created during sprint timeframe..."
 
-incidents=$(curl -s -u \${{ secrets.JIRA_EMAIL }}:\${{ secrets.JIRA_TOKEN }} \\
-  -G --data-urlencode "jql=labels in (\\"security-incident\\", \\"vulnerability\\") AND created >= \\"$start_date\\" AND created <= \\"$end_date\\"" \\
-  "\${{ secrets.JIRA_URL }}/rest/api/2/search?fields=key,summary,created")
+incidents=$(curl -s -u {{JIRA_EMAIL}}:\${{ secrets.JIRA_TOKEN }} \\
+  -G --data-urlencode "jql=labels in (\\"{{SECURITY_INCIDENT_LABEL}}\\") AND created >= \\"$start_date\\" AND created <= \\"$end_date\\"" \\
+  "{{JIRA_URL}}/rest/api/2/search?fields=key,summary,created")
 
 echo "$incidents" > security_incidents.json
       `.trim()
@@ -208,9 +200,9 @@ echo "$incidents" > security_incidents.json
                 name: 'Fetch JIRA Bugs',
                 command: `
 echo "Fetching issues of type 'Bug' from JIRA..."
-bugs=$(curl -s -u \${{ secrets.JIRA_EMAIL }}:\${{ secrets.JIRA_TOKEN }} \\
+bugs=$(curl -s -u {{JIRA_EMAIL}}:\${{ secrets.JIRA_TOKEN }} \\
   -G --data-urlencode "jql=issuetype=Bug" \\
-  "\${{ secrets.JIRA_URL }}/rest/api/2/search?fields=key,summary,created")
+  "{{JIRA_URL}}/rest/api/2/search?fields=key,summary,created")
 
 echo "$bugs" > jira_bugs.json
       `.trim()
