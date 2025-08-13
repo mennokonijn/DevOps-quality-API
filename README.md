@@ -1,9 +1,10 @@
-```markdown
 # DevOps Quality Tool – Backend
 
 This is the backend server for the DevOps Quality Tool. It serves an API that provides a health check and will later handle analysis of GitHub repositories.
 
-## 🧰 Tech Stack
+---
+
+### Tech Stack
 
 - Node.js 22+
 - Express
@@ -11,41 +12,44 @@ This is the backend server for the DevOps Quality Tool. It serves an API that pr
 - Nodemon (dev)
 - CORS enabled for local frontend access
 
-## 🔧 Setup
+---
 
-1. **Install dependencies**
-   ```bash
-   npm run dev
-   ```
-2. **Start the development server**
-   ```bash
-    npm run dev
-   ```
-3. Open your browser and go to `http://localhost:4000/health` to check the health status.
+## Setup Overview
 
-# DevOps Quality Tool – SonarQube Setup
-    ```bash
+Open your terminal and run the following commands to set up the full environment:
+
+### Full Setup Script
+
+```bash
+# Copy env.sample in .env file
+cp .env.sample .env
+
+# Install dependencies
+npm install
+
+# Start the development server
+npm run dev
+
+# Run SonarQube (via Docker)
 docker run -d --name sonarqube -p 9000:9000 sonarqube:lts
+
+# Install Sonar Scanner globally
 npm install -g sonar-scanner
 
-    ```
+# Install ngrok (macOS with Homebrew)
+brew install ngrok
 
-# DevOps Quality Tool – Ngrok setup
-You can get your authtoken from: https://dashboard.ngrok.com/signup
-    ```bash
-install ngrok
-ngrok config add-authtoken (your_auth_token_here)
+# Add ngrok authtoken (replace with your actual token)
+ngrok config add-authtoken your_auth_token_here
+
+# Start ngrok tunnel for backend server
 ngrok http 4000
-    ```
 
-Add the generated ngrok URL to your .env file
+# Add ngrok URL to .env file
 
-
-# DevOps Quality Tool – Postgres setup
-    ```bash
+# Install and start PostgreSQL (macOS with Homebrew)
 brew install postgresql
 brew services start postgresql
 
-whoami in .env (use for database access)
-
-   ```
+# Get your system username (for .env DB_USER value)
+whoami
