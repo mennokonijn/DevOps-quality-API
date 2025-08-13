@@ -41,6 +41,7 @@ export function generateGitHubActionsYaml(
     nodeVersion: string,
     port?: number,
     startCommand?: string,
+    installCommand: string = 'npm install',
     securityIncidentLabel: string = 'Security Incident',
     completionLabel: string = 'Done',
     jiraEmail: string = '',
@@ -114,7 +115,8 @@ curl -s -H "Authorization: token \${{ secrets.GITHUB_TOKEN }}" \\
   -H 'Content-Type: application/json' \\
   -H 'X-Tool-Name: SonarQube' \\
   -H 'X-Repo-Name: ${repo}' \\
-  --data @sonar-results.json`
+  --data @sonar-results.json`,
+                continueOnError: true
             });
         }
 
@@ -125,7 +127,8 @@ curl -s -H "Authorization: token \${{ secrets.GITHUB_TOKEN }}" \\
   -H 'Content-Type: application/json' \\
   -H 'X-Tool-Name: Trivy' \\
   -H 'X-Repo-Name: ${repo}' \\
-  --data @trivy-results.json`
+  --data @trivy-results.json`,
+                continueOnError: true
             });
         }
 
@@ -136,7 +139,8 @@ curl -s -H "Authorization: token \${{ secrets.GITHUB_TOKEN }}" \\
   -H 'Content-Type: application/json' \\
   -H 'X-Tool-Name: GitLeaks' \\
   -H 'X-Repo-Name: ${repo}' \\
-  --data @gitleaks.json`
+  --data @gitleaks.json`,
+                continueOnError: true
             });
         }
 
@@ -147,7 +151,8 @@ curl -s -H "Authorization: token \${{ secrets.GITHUB_TOKEN }}" \\
   -H 'Content-Type: application/json' \\
   -H 'X-Tool-Name: Jest' \\
   -H 'X-Repo-Name: ${repo}' \\
-  --data @jest-results.json`
+  --data @jest-results.json`,
+                continueOnError: true
             });
         }
 
@@ -158,7 +163,8 @@ curl -s -H "Authorization: token \${{ secrets.GITHUB_TOKEN }}" \\
   -H 'Content-Type: application/json' \\
   -H 'X-Tool-Name: Jira-SprintPoints' \\
   -H 'X-Repo-Name: ${repo}' \\
-  --data @sprint_points.json`
+  --data @sprint_points.json`,
+                continueOnError: true
             });
         }
 
@@ -169,7 +175,8 @@ curl -s -H "Authorization: token \${{ secrets.GITHUB_TOKEN }}" \\
   -H 'Content-Type: application/json' \\
   -H 'X-Tool-Name: Jira-Security-Epics' \\
   -H 'X-Repo-Name: ${repo}' \\
-  --data @epics.json`
+  --data @epics.json`,
+                continueOnError: true
             });
         }
 
@@ -180,14 +187,16 @@ curl -s -H "Authorization: token \${{ secrets.GITHUB_TOKEN }}" \\
   -H 'Content-Type: application/json' \\
   -H 'X-Tool-Name: Jira-Security-Incidents' \\
   -H 'X-Repo-Name: ${repo}' \\
-  --data @security_incidents.json`
+  --data @security_incidents.json`,
+                continueOnError: true
             });
         }
 
         if (tool === 'Jira-Defect-Density') {
             allSteps.push({
                 name: 'Merge Defect Density Inputs',
-                command: `jq -s '.[0] * .[1]' jira_bugs.json loc.json > defect_density.json`
+                command: `jq -s '.[0] * .[1]' jira_bugs.json loc.json > defect_density.json`,
+                continueOnError: true
             });
 
             allSteps.push({
@@ -196,7 +205,8 @@ curl -s -H "Authorization: token \${{ secrets.GITHUB_TOKEN }}" \\
   -H 'Content-Type: application/json' \\
   -H 'X-Tool-Name: Jira-Defect-Density' \\
   -H 'X-Repo-Name: ${repo}' \\
-  --data @defect_density.json`
+  --data @defect_density.json`,
+                continueOnError: true
             });
         }
 
@@ -207,7 +217,8 @@ curl -s -H "Authorization: token \${{ secrets.GITHUB_TOKEN }}" \\
   -H 'Content-Type: application/json' \\
   -H 'X-Tool-Name: Language-Impact' \\
   -H 'X-Repo-Name: ${repo}' \\
-  --data @languages.json`
+  --data @languages.json`,
+                continueOnError: true
             });
         }
 
@@ -218,7 +229,20 @@ curl -s -H "Authorization: token \${{ secrets.GITHUB_TOKEN }}" \\
   -H 'Content-Type: application/json' \\
   -H 'X-Tool-Name: Depcheck' \\
   -H 'X-Repo-Name: ${repo}' \\
-  --data @depcheck-results.json`
+  --data @depcheck-results.json`,
+                continueOnError: true
+            });
+        }
+
+        if (tool === 'Outdated-Packages') {
+            allSteps.push({
+                name: 'Send Outdated Packages to API',
+                command: `curl -X POST ${NGROK_URL}/api/metrics \\
+  -H 'Content-Type: application/json' \\
+  -H 'X-Tool-Name: Outdated-Packages' \\
+  -H 'X-Repo-Name: ${repo}' \\
+  --data @outdated.json`,
+                continueOnError: true
             });
         }
 
@@ -229,7 +253,8 @@ curl -s -H "Authorization: token \${{ secrets.GITHUB_TOKEN }}" \\
   -H 'Content-Type: application/json' \\
   -H 'X-Tool-Name: ZAP' \\
   -H 'X-Repo-Name: ${repo}' \\
-  --data @zap-report.json`
+  --data @zap-report.json`,
+                continueOnError: true
             });
         }
 
@@ -240,7 +265,8 @@ curl -s -H "Authorization: token \${{ secrets.GITHUB_TOKEN }}" \\
   -H 'Content-Type: application/json' \\
   -H 'X-Tool-Name: Deployment-Frequency' \\
   -H 'X-Repo-Name: ${repo}' \\
-  --data @deployment_frequency.json`
+  --data @deployment_frequency.json`,
+                continueOnError: true
             });
         }
 
@@ -251,7 +277,8 @@ curl -s -H "Authorization: token \${{ secrets.GITHUB_TOKEN }}" \\
   -H 'Content-Type: application/json' \\
   -H 'X-Tool-Name: Deployment-Time' \\
   -H 'X-Repo-Name: ${repo}' \\
-  --data @deployment_time.json`
+  --data @deployment_time.json`,
+                continueOnError: true
             });
         }
 
@@ -262,7 +289,8 @@ curl -s -H "Authorization: token \${{ secrets.GITHUB_TOKEN }}" \\
   -H 'Content-Type: application/json' \\
   -H 'X-Tool-Name: MTTR' \\
   -H 'X-Repo-Name: ${repo}' \\
-  --data @mttr.json`
+  --data @mttr.json`,
+                continueOnError: true
             });
         }
     });
@@ -322,7 +350,7 @@ jobs:
           node-version: ${nodeVersion}
 
       - name: Install dependencies
-        run: npm install
+        run: ${installCommand}
 
 ${stepsYaml}
 `.trim();

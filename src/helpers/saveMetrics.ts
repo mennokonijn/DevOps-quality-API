@@ -1,6 +1,28 @@
 import {calculateWeightedEnergy} from "../utils/calculateEnergy";
 import {pool} from "../database/createDatabase";
 
+type CycloneDXLicense = {
+    license?: {
+        id?: string;
+        expression?: string;
+    };
+};
+
+type CycloneDXProperty = {
+    name: string;
+    value: string;
+};
+
+export type CycloneDXComponent = {
+    'bom-ref': string;
+    type: string;
+    name: string;
+    version?: string;
+    licenses?: CycloneDXLicense[];
+    purl?: string;
+    properties?: CycloneDXProperty[];
+};
+
 
 export const saveMetrics = async (repo: string, tool: string, req: any) => {
     const client = await pool.connect();
@@ -59,8 +81,6 @@ export const saveMetrics = async (repo: string, tool: string, req: any) => {
         const functionsNr = getValue('functions');
         const ncloc = getValue('ncloc');
 
-        console.log(ncloc)
-
         const smellDensity = (
             typeof codeSmells === 'number' &&
             typeof ncloc === 'number' &&
@@ -111,57 +131,71 @@ export const saveMetrics = async (repo: string, tool: string, req: any) => {
         console.log(`SonarQube metrics saved for repository "${repo}"`);
     }
 
+    else if (tool === 'Outdated-Packages') {
+        const outdated = req.body ?? {};
+
+        console.log(outdated)
+
+        for (const [pkg, data] of Object.entries(outdated)) {
+            const { current, latest } = data as {
+                current?: string;
+                latest?: string;
+            };
+
+            await client.query(
+                `INSERT INTO outdated_packages (
+                scan_id, package_name, installed_version, fixed_versions
+             ) VALUES ($1, $2, $3, $4)
+             ON CONFLICT (scan_id, package_name) DO UPDATE
+             SET
+               installed_version = EXCLUDED.installed_version,
+               fixed_versions = EXCLUDED.fixed_versions;`,
+                [scanId, pkg, current ?? null, latest ?? null]
+            );
+        }
+
+        console.log(`Outdated packages saved for "${repo}"`);
+    }
+
+
     else if (tool === 'Trivy') {
-        const results = req.body?.Results ?? [];
+        const vulnerabilities = req.body?.vulnerabilities ?? [];
+        const components: CycloneDXComponent[] = req.body?.components ?? [];
         const seen = new Set();
-        const uniqueLicenses = new Set<string>();
 
-        for (const result of results) {
-            const vulns = result.Vulnerabilities ?? [];
-            for (const vuln of vulns) {
-                const key = `${vuln.VulnerabilityID}:${vuln.PkgName}`;
-                if (seen.has(key)) continue;
-                seen.add(key);
+        for (const vuln of vulnerabilities) {
+            const id = vuln.id ?? 'Unknown CVE';
+            const severity = vuln.ratings?.[0]?.severity ?? 'UNKNOWN';
+            const score = vuln.ratings?.[0]?.score;
+            const affected = vuln.affects?.[0]?.ref;
 
-                const id = vuln?.VulnerabilityID ?? 'Unknown CVE';
-                const severity = vuln?.Severity ?? 'UNKNOWN';
-                const score = vuln?.CVSS?.ghsa?.V3Score ?? vuln?.CVSS?.nvd?.V3Score;
-                const pkg = vuln?.PkgName;
-                const installed = vuln?.InstalledVersion;
-                const fixed = vuln?.FixedVersion;
-                const file = result?.Target;
-                const title = vuln?.Title?.toLowerCase() ?? '';
-                const description = vuln?.Description?.toLowerCase() ?? '';
-                const isLicenseIssue = title.includes('license') || description.includes('license');
+            // Extract component info from the BOM (if needed)
+            const component = components.find(c => c['bom-ref'] === affected);
+            const pkg = component?.name ?? affected;
+            const installed = component?.version ?? null;
 
-                if (typeof score === 'number') {
-                    await client.query(
-                        `INSERT INTO cve_vulnerabilities (scan_id, cve_id, package_name, severity, score)
-                                VALUES ($1, $2, $3, $4, $5);`,
-                        [scanId, id, pkg, severity, score]
-                    );
-                }
+            const key = `${id}:${pkg}`;
+            if (seen.has(key)) continue;
+            seen.add(key);
 
-                if (pkg && installed && fixed && fixed !== installed) {
-                    await client.query(
-                        `INSERT INTO outdated_packages (scan_id, package_name, installed_version, fixed_versions, severity, file_path)
-                           VALUES ($1, $2, $3, $4, $5, $6)
-                           ON CONFLICT (scan_id, package_name)
-                           DO UPDATE SET
-                             installed_version = EXCLUDED.installed_version,
-                             fixed_versions = EXCLUDED.fixed_versions,
-                             severity = EXCLUDED.severity,
-                             file_path = EXCLUDED.file_path;`,
-                        [scanId, pkg, installed, fixed, severity, file]
-                    );
-
-                }
+            if (typeof score === 'number') {
+                await client.query(
+                    `INSERT INTO cve_vulnerabilities (scan_id, cve_id, package_name, severity, score)
+                        VALUES ($1, $2, $3, $4, $5);`,
+                    [scanId, id, pkg, severity, score]
+                );
             }
+        }
 
-            const licenses = result.Licenses ?? [];
+        const uniqueLicenses = new Set<string>();
+        for (const c of components) {
+            const licenses = c.licenses ?? [];
+
             for (const license of licenses) {
-                if (license.Name) {
-                    uniqueLicenses.add(license.Name);
+                if (license.license?.id) {
+                    uniqueLicenses.add(license.license.id);
+                } else if (license.license?.expression) {
+                    uniqueLicenses.add(license.license.expression);
                 }
             }
         }
@@ -169,14 +203,13 @@ export const saveMetrics = async (repo: string, tool: string, req: any) => {
         for (const licenseName of uniqueLicenses) {
             await client.query(
                 `INSERT INTO project_licenses (scan_id, license_name)
-                     VALUES ($1, $2)
-                     ON CONFLICT (scan_id, license_name) DO NOTHING;`,
+                 VALUES ($1, $2)
+                 ON CONFLICT (scan_id, license_name) DO NOTHING;`,
                 [scanId, licenseName]
             );
         }
 
-
-        console.log(`Trivy results saved for repository "${repo}"`);
+        console.log(`✅ Trivy CycloneDX results saved for repository "${repo}"`);
     }
 
     else if (tool === 'Jest') {
@@ -238,6 +271,14 @@ export const saveMetrics = async (repo: string, tool: string, req: any) => {
             const line = finding.StartLine || 0;
             const description = finding.Description || '';
             const detectedAt = finding.date || new Date().toISOString();
+
+            // Skip known false positives
+            if (
+                file.includes('.github/workflows/quality') ||
+                (rule === 'sidekiq-secret' && file.toLowerCase().includes('readme') && line === 50)
+            ) {
+                continue;
+            }
 
             await client.query(
                 `INSERT INTO gitleaks_findings (

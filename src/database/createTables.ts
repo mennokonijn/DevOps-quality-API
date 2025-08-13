@@ -40,7 +40,8 @@ const createTables = async () => {
         await client.query(`
           CREATE TABLE IF NOT EXISTS repositories (
             id SERIAL PRIMARY KEY,
-            name TEXT NOT NULL
+            name TEXT NOT NULL,
+            metrics TEXT
           );
       
           CREATE TABLE IF NOT EXISTS scans (

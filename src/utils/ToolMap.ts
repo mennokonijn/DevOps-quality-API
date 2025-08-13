@@ -1,11 +1,36 @@
 import {ToolConfig} from "../helpers/generatePipeline";
 
+export enum ToolName {
+    ZAP = 'ZAP',
+    OutdatedPackages = 'Outdated-Packages',
+    Depcheck = 'Depcheck',
+    GitLeaks = 'GitLeaks',
+    Jest = 'Jest',
+    SonarQube = 'SonarQube',
+    Trivy = 'Trivy',
+    TrivyOpen = 'Trivy-Open',
+    JiraSprintPoints = 'Jira-SprintPoints',
+    JiraSecurityEpics = 'Jira-Security-Epics',
+    JiraSecurityIncidents = 'Jira-Security-Incidents',
+    JiraDefectDensity = 'Jira-Defect-Density',
+    LanguageImpact = 'Language-Impact',
+    DeploymentFrequency = 'Deployment-Frequency',
+    DeploymentTime = 'Deployment-Time',
+    MTTR = 'MTTR',
+    CodeSmells = 'code_smells',
+    Complexity = 'complexity',
+    CognitiveComplexity = 'cognitive_complexity',
+    DuplicatedLinesDensity = 'duplicated_lines_density',
+    Coverage = 'coverage'
+}
+
 export const TOOL_MAP: Record<string, ToolConfig> = {
     SonarQube: {
         steps: [
             {
                 name: 'Install SonarScanner',
-                command: 'npm install -g sonarqube-scanner'
+                command: 'npm install -g sonarqube-scanner',
+                continueOnError: true
             },
             {
                 name: 'Run SonarQube Analysis',
@@ -13,23 +38,30 @@ export const TOOL_MAP: Record<string, ToolConfig> = {
   -Dsonar.projectKey=\${{ secrets.SONAR_PROJECT_KEY }} \\
   -Dsonar.sources=src \\
   -Dsonar.host.url=\${{ secrets.SONAR_HOST_URL }} \\
-  -Dsonar.login=\${{ secrets.SONAR_TOKEN }}`
+  -Dsonar.token=\${{ secrets.SONAR_TOKEN }}`,
+                 continueOnError: true
             },
             {
                 name: 'Wait for SonarQube Analysis to Complete',
                 command: `echo 'Waiting for SonarQube analysis...' && \\
+MAX_RETRIES=10 && \\
+COUNT=0 && \\
 while true; do \\
   STATUS=$(curl -s -u \${{ secrets.SONAR_TOKEN }}: "\${{ secrets.SONAR_HOST_URL }}/api/ce/component?component=\${{ secrets.SONAR_PROJECT_KEY }}" | jq -r '.current.status'); \\
-  echo "Current SonarQube status: $STATUS"; \\
+  echo "Attempt $COUNT - SonarQube status: $STATUS"; \\
   if [ "$STATUS" = "SUCCESS" ] || [ "$STATUS" = "FAILED" ]; then break; fi; \\
+  COUNT=$((COUNT + 1)); \\
+  if [ "$COUNT" -ge "$MAX_RETRIES" ]; then echo "Max retries reached ($MAX_RETRIES). Exiting loop."; break; fi; \\
   sleep 5; \\
-done`
+done`,
+                continueOnError: true
             },
             {
                 name: 'Fetch SonarQube Metrics',
                 command: `curl -s -u \${{ secrets.SONAR_TOKEN }}: \\
   "\${{ secrets.SONAR_HOST_URL }}/api/measures/component?component=\${{ secrets.SONAR_PROJECT_KEY }}&metricKeys={{SONARQUBE_METRIC_KEYS}}" \\
-  -o sonar-results.json`
+  -o sonar-results.json`,
+                continueOnError: true
             }
         ]
     },
@@ -62,28 +94,32 @@ gitleaks detect \\
         steps: [
             {
                 name: 'Install Trivy',
-                command: `curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin`
+                command: `curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin`,
+                continueOnError: true
             },
             {
-                name: 'Install CycloneDX SBOM Generator',
-                command: `npm install --save-dev @cyclonedx/cyclonedx-npm`
+                name: 'Run Trivy scan with SBOM, CVEs, and licenses',
+                command: `trivy fs --scanners vuln,license --format cyclonedx --output trivy-results.json .`,
+                continueOnError: true
             },
-            {
-                name: 'Generate SBOM (CycloneDX JSON)',
-                command: `npx cyclonedx-npm --output-format json > bom.json`
-            },
-            {
-                name: 'Run Trivy on SBOM (licenses + CVEs)',
-                command: `trivy sbom --scanners vuln,license --format json --output trivy-results.json bom.json`
-            }
         ]
     },
     Jest: {
         steps: [
             {
                 name: 'Run Jest Tests',
-                command: 'npx jest --coverage --outputFile=jest-results.json --json'
+                command: 'npx jest --coverage --outputFile=jest-results.json --json',
+                continueOnError: true
             }
+        ]
+    },
+    'Outdated-Packages': {
+        steps: [
+            {
+                name: 'Check for outdated npm packages',
+                command: 'npm outdated --json > outdated.json || true',
+                continueOnError: true
+            },
         ]
     },
 
@@ -139,7 +175,8 @@ for row in $(echo "$completed_sprints" | jq -r '.[] | @base64'); do
 done
 
 echo "$results" > sprint_points.json
-      `.trim()
+      `.trim(),
+                continueOnError: true
             }
         ]
     },
@@ -155,7 +192,8 @@ epics=$(curl -s -u {{JIRA_EMAIL}}:\${{ secrets.JIRA_TOKEN }} \\
   "{{JIRA_URL}}/rest/api/2/search?fields=key,summary,labels")
 
 echo "$epics" > epics.json
-      `.trim()
+      `.trim(),
+                continueOnError: true
             }
         ]
     },
@@ -190,7 +228,8 @@ incidents=$(curl -s -u {{JIRA_EMAIL}}:\${{ secrets.JIRA_TOKEN }} \\
   "{{JIRA_URL}}/rest/api/2/search?fields=key,summary,created")
 
 echo "$incidents" > security_incidents.json
-      `.trim()
+      `.trim(),
+                continueOnError: true
             }
         ]
     },
@@ -205,7 +244,8 @@ bugs=$(curl -s -u {{JIRA_EMAIL}}:\${{ secrets.JIRA_TOKEN }} \\
   "{{JIRA_URL}}/rest/api/2/search?fields=key,summary,created")
 
 echo "$bugs" > jira_bugs.json
-      `.trim()
+      `.trim(),
+                continueOnError: true
             },
             {
                 name: 'Count LOC for Defect Density',
@@ -215,7 +255,8 @@ loc=$(find ./src -type f \\( -name '*.ts' -o -name '*.js' -o -name '*.tsx' -o -n
 kloc=$(echo "scale=2; $loc / 1000" | bc)
 
 echo "{ \\"loc\\": $loc, \\"kloc\\": $kloc }" > loc.json
-      `.trim()
+      `.trim(),
+                continueOnError: true
             }
         ]
     },
@@ -228,7 +269,8 @@ echo "Fetching language breakdown from GitHub API..."
 curl -s -H "Authorization: token \${{ secrets.GITHUB_TOKEN }}" \\
   https://api.github.com/repos/\${{ github.repository }}/languages \\
   -o languages.json
-            `.trim()
+            `.trim(),
+                continueOnError: true
             }
         ]
     },
@@ -236,23 +278,27 @@ curl -s -H "Authorization: token \${{ secrets.GITHUB_TOKEN }}" \\
         steps: [
             {
                 name: 'Install Depcheck',
-                command: 'npm install -g depcheck'
+                command: 'npm install -g depcheck',
+                continueOnError: true
             },
             {
                 name: 'Run Depcheck',
-                command: 'depcheck --json > depcheck-results.json || true'
+                command: 'depcheck --json > depcheck-results.json || true',
+                continueOnError: true
             }
         ]
     },
     'ZAP': {
         steps: [
             {
-                name: 'Start Express App',
-                command: 'PORT={{PORT}} {{START_COMMAND}} &'
+                name: 'Start App',
+                command: 'PORT={{PORT}} {{START_COMMAND}} &',
+                continueOnError: true
             },
             {
                 name: 'Wait for app to be ready',
-                command: 'sleep 10'
+                command: 'sleep 15',
+                continueOnError: true
             },
             {
                 name: 'Run OWASP ZAP Baseline Scan',
@@ -280,7 +326,8 @@ jq -Rn '
   [inputs
    | capture("(?<count>\\\\d+) (?<date>\\\\d{4}-\\\\d{2}-\\\\d{2})")
    | {date: .date, count: (.count | tonumber)}]' > deployment_frequency.json
-        `.trim()
+        `.trim(),
+                continueOnError: true
             }
         ]
     },
@@ -307,7 +354,8 @@ jq -c '.[]' deployments.json | while read -r deployment; do
   jq --arg sha "$sha" --argjson hrs "$lead_time_hr" \\
     '. += [{"sha": $sha, "lead_time_hours": $hrs}]' deployment_time.json > tmp.json && mv tmp.json deployment_time.json
 done
-        `.trim()
+        `.trim(),
+                continueOnError: true
             }
         ]
     },
@@ -335,7 +383,8 @@ jq -r '.[].id' deployments.json | while read -r id; do
       '. += [{"deployment_id": $id, "mttr_minutes": $m}]' mttr.json > tmp.json && mv tmp.json mttr.json
   fi
 done
-        `.trim()
+        `.trim(),
+                continueOnError: true
             }
         ]
     }

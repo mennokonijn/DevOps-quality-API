@@ -1,4 +1,5 @@
 import {pool} from "../database/createDatabase";
+import {ToolName} from "../utils/ToolMap";
 
 type ZapAlert = {
     description: string;
@@ -18,7 +19,7 @@ export const extractResults = async (repoName: any): Promise<Record<string, Scan
     const client = await pool.connect();
 
     const repoRes = await client.query(
-        `SELECT id FROM repositories WHERE name = $1`,
+        `SELECT id, metrics FROM repositories WHERE name = $1`,
         [repoName]
     );
 
@@ -28,6 +29,7 @@ export const extractResults = async (repoName: any): Promise<Record<string, Scan
     }
 
     const repositoryId = repoRes.rows[0].id;
+    const selectedMetrics = repoRes.rows[0].metrics;
 
     const scansRes = await client.query(
         `SELECT id, started_at FROM scans WHERE repository_id = $1 ORDER BY started_at ASC`,
@@ -64,151 +66,363 @@ export const extractResults = async (repoName: any): Promise<Record<string, Scan
         };
 
         // Code metrics
-        if (codeRes.rowCount) {
-            const c = codeRes.rows[0];
-            scan.Code.push(
-                { name: 'Average Cyclomatic Complexity per function', value: c.cyclomatic_complexity?.toString() ?? '-' },
-                { name: 'Average Cognitive Complexity per function', value: c.cognitive_complexity?.toString() ?? '-' },
-                { name: 'Code Smells per KLOC', value: c.code_smells?.toString() ?? '-' },
-                { name: 'Duplicated Lines Density', value: c.duplicated_lines_density?.toString() ?? '-' },
-                { name: 'Programming Language Energy Impact', value: c.programming_language_impact?.toString() ?? '-' }
-            );
+        if (selectedMetrics.includes(ToolName.Complexity)) {
+            if (codeRes.rowCount) {
+                const c = codeRes.rows[0];
+                if (c.cyclomatic_complexity != null) {
+                    scan.Code.push({
+                        name: 'Average Cyclomatic Complexity per function',
+                        value: c.cyclomatic_complexity.toString()
+                    });
+                } else {
+                    scan.Code.push({
+                        name: 'Average Cyclomatic Complexity per function',
+                        value: 'Not available'
+                    });
+                }
+            } else {
+                scan.Code.push({
+                    name: 'Average Cyclomatic Complexity per function',
+                    value: 'Not available'
+                });
+            }
         }
 
-        if (buildRes.rowCount) {
-            const b = buildRes.rows[0];
-            const rawUnused = b.unused_libraries?.trim();
+        if (selectedMetrics.includes(ToolName.CognitiveComplexity)) {
+            if (codeRes.rowCount) {
+                const c = codeRes.rows[0];
+                if (c.cognitive_complexity != null) {
+                    scan.Code.push({
+                        name: 'Average Cognitive Complexity per function',
+                        value: c.cognitive_complexity.toString()
+                    });
+                } else {
+                    scan.Code.push({
+                        name: 'Average Cognitive Complexity per function',
+                        value: 'Not available'
+                    });
+                }
+            } else {
+                scan.Code.push({
+                    name: 'Average Cognitive Complexity per function',
+                    value: 'Not available'
+                });
+            }
+        }
 
-            const unused = rawUnused && rawUnused.toLowerCase() !== 'null'
-                ? rawUnused.split(',').map((s: string) => s.trim()).filter(Boolean)
-                : [];
+        if (selectedMetrics.includes(ToolName.CodeSmells)) {
+            if (codeRes.rowCount) {
+                const c = codeRes.rows[0];
+                if (c.code_smells != null) {
+                    scan.Code.push({
+                        name: 'Code Smells per KLOC',
+                        value: c.code_smells.toString()
+                    });
+                } else {
+                    scan.Code.push({
+                        name: 'Code Smells per KLOC',
+                        value: 'Not available'
+                    });
+                }
+            } else {
+                scan.Code.push({
+                    name: 'Code Smells per KLOC',
+                    value: 'Not available'
+                });
+            }
+        }
 
-            const value = unused.length
-                ? `Total Unused Libraries: ${unused.length}\n` + unused.map((lib: string) => `- ${lib}`).join('\n')
-                : '-';
+        if (selectedMetrics.includes(ToolName.DuplicatedLinesDensity)) {
+            if (codeRes.rowCount) {
+                const c = codeRes.rows[0];
+                if (c.duplicated_lines_density != null) {
+                    scan.Code.push({
+                        name: 'Duplicated Lines Density',
+                        value: c.duplicated_lines_density.toString() + '%'
+                    });
+                } else {
+                    scan.Code.push({
+                        name: 'Duplicated Lines Density',
+                        value: 'Not available'
+                    });
+                }
+            } else {
+                scan.Code.push({
+                    name: 'Duplicated Lines Density',
+                    value: 'Not available'
+                });
+            }
+        }
 
-            scan.Build.push({
-                name: 'Unused Libraries',
-                value
-            });
+        if (selectedMetrics.includes(ToolName.LanguageImpact)) {
+            if (codeRes.rowCount) {
+                const c = codeRes.rows[0];
+                if (c.programming_language_impact != null) {
+                    scan.Code.push({
+                        name: 'Programming Language Energy Impact',
+                        value: c.programming_language_impact.toString()
+                    });
+                } else {
+                    scan.Code.push({
+                        name: 'Programming Language Energy Impact',
+                        value: 'Not available'
+                    });
+                }
+            } else {
+                scan.Code.push({
+                    name: 'Programming Language Energy Impact',
+                    value: 'Not available'
+                });
+            }
+        }
+
+        if (selectedMetrics.includes(ToolName.Depcheck)) {
+            if (buildRes.rowCount) {
+                const b = buildRes.rows[0];
+                const rawUnused = b.unused_libraries?.trim();
+
+                const unused = rawUnused && rawUnused.toLowerCase() !== 'null'
+                    ? rawUnused.split(',').map((s: string) => s.trim()).filter(Boolean)
+                    : [];
+
+                const value = unused.length
+                    ? `Total Unused Libraries: ${unused.length}\n` + unused.map((lib: string) => `- ${lib}`).join('\n')
+                    : 0;
+
+                scan.Build.push({
+                    name: 'Unused Libraries',
+                    value
+                });
+            } else {
+                scan.Build.push({
+                    name: 'Unused Libraries',
+                    value: 0
+                });
+            }
         }
 
         // Library Freshness
-        if (outdatedRes.rowCount) {
-            const total = outdatedRes.rowCount;
-            const list = outdatedRes.rows.map((r: any) =>
-                `- ${r.package_name} ${r.installed_version} → ${r.fixed_versions ?? '?'}`
-            ).join('\n');
+        if (selectedMetrics.includes(ToolName.OutdatedPackages)) {
+            if (outdatedRes.rowCount) {
+                const total = outdatedRes.rowCount;
+                const list = outdatedRes.rows.map((r: any) =>
+                    `- ${r.package_name} ${r.installed_version} → ${r.fixed_versions ?? '?'}`
+                ).join('\n');
 
-            scan.Code.push({
-                name: 'Outdated Packages',
-                value: `Outdated Libraries: ${total}\n${list}`,
-            });
+                scan.Code.push({
+                    name: 'Outdated Packages',
+                    value: `Outdated Libraries: ${total}\n${list}`,
+                });
+            } else {
+                scan.Code.push({
+                    name: 'Outdated Packages',
+                    value: 'No outdated packages found.'
+                });
+            }
         }
 
 
         // Test metrics
-        if (testRes.rowCount) {
-            const t = testRes.rows[0];
-            scan.Test.push(
-                { name: 'Test Success Density', value: (t.test_success_density ? t.test_success_density + '%' : '-') },
-                { name: 'Total Coverage', value: t.total_coverage?.toString() ?? '-' }
-            );
+        if (selectedMetrics.includes(ToolName.Jest)) {
+            if (testRes.rowCount) {
+                scan.Test.push({
+                    name: 'Test Success Density',
+                    value: (testRes.rows[0].test_success_density ? Number(testRes.rows[0].test_success_density).toFixed(2) + '%' : 'Not available')
+                });
+            } else {
+                scan.Test.push({
+                    name: 'Test Success Density',
+                    value: 'No test data available.'
+                });
+            }
+        }
+        if (selectedMetrics.includes(ToolName.Coverage)) {
+            if (testRes.rowCount) {
+                const t = testRes.rows[0];
+                scan.Test.push(
+                    {name: 'Total Coverage', value: t.total_coverage?.toString() ?? 'Not available'}
+                );
+            } else {
+                scan.Test.push({
+                    name: 'Total Coverage',
+                    value: 'No test data available.'
+                });
+            }
         }
 
         // ZAP Alerts
-        if (zapAlertsRes.rowCount) {
-            const rows = zapAlertsRes.rows;
-
-            scan.Test.push({
-                name: 'OWASP ZAP Penetration Tests Findings',
-                value: zapAlertsRes.rows.map((r: any) => ({
-                    description: r.description,
-                    alert: r.alert,
-                    riskcode: r.riskcode,
-                    solution: r.solution,
-                    reference: r.reference
-                }))
-            });
-
+        if (selectedMetrics.includes(ToolName.ZAP)) {
+            if (zapAlertsRes.rowCount) {
+                scan.Test.push({
+                    name: 'OWASP ZAP Penetration Tests Findings',
+                    value: zapAlertsRes.rows.map((r: any) => ({
+                        description: r.description,
+                        alert: r.alert,
+                        riskcode: r.riskcode,
+                        solution: r.solution,
+                        reference: r.reference
+                    }))
+                });
+            } else {
+                scan.Test.push({
+                    name: 'OWASP ZAP Penetration Tests Findings',
+                    value: 'No ZAP findings found.'
+                });
+            }
         }
 
 
         // CVEs
-        if (cveRes.rowCount) {
-            const scores = cveRes.rows.map((r: any) => r.score);
-            const avg = scores.length ? (scores.reduce((a, b) => +a + +b, 0) / scores.length).toFixed(1) : '-';
-            const detail = cveRes.rows.map((r: any) => `- ${r.cve_id} [${r.severity}] → ${r.score}`).join('\n');
+        if (selectedMetrics.includes(ToolName.Trivy)) {
+            if (!cveRes.rowCount) {
+                scan.Build.push({
+                    name: 'CVE identifiers and CVSS scores',
+                    value: `No CVEs found for this scan.`,
+                });
+            } else {
+                const scores = cveRes.rows.map((r: any) => r.score);
+                const avg = scores.length ? (scores.reduce((a, b) => +a + +b, 0) / scores.length).toFixed(1) : '-';
+                const detail = cveRes.rows.map((r: any) => `- ${r.cve_id} [${r.severity}] → ${r.score}`).join('\n');
 
-            scan.Build.push({
-                name: 'CVE identifiers and CVSS scores',
-                value: `Total: ${cveRes.rowCount}, Avg CVSS: ${avg}\n${detail}`,
-            });
+                scan.Build.push({
+                    name: 'CVE identifiers and CVSS scores',
+                    value: `Total: ${cveRes.rowCount}, Avg CVSS: ${avg}\n${detail}`,
+                });
+            }
         }
 
         // GitLeaks
-        if (gitleaksRes.rowCount) {
-            const count = gitleaksRes.rowCount;
-            const ruleSummary = gitleaksRes.rows
-                .map((r: any) => `- ${r.rule} in ${r.file_path}:${r.line_number}`)
-                .join('\n');
+        if (selectedMetrics.includes(ToolName.GitLeaks)) {
+            if (gitleaksRes.rowCount) {
+                const count = gitleaksRes.rowCount;
+                const ruleSummary = gitleaksRes.rows
+                    .map((r: any) => `- ${r.rule} in ${r.file_path}:${r.line_number}`)
+                    .join('\n');
 
-            scan.Build.push({
-                name: 'Secrets detected by GitLeaks',
-                value: `Total Leaks: ${count}\n${ruleSummary}`,
-            });
+                scan.Build.push({
+                    name: 'Secrets detected by GitLeaks',
+                    value: `Total Leaks: ${count}\n${ruleSummary}`,
+                });
+            } else {
+                scan.Build.push({
+                    name: 'Secrets detected by GitLeaks',
+                    value: 'No secrets found.'
+                });
+            }
         }
 
         // project licenses
-        if (licenseRes.rowCount) {
-            const uniqueLicenses = Array.from(new Set(licenseRes.rows.map((r: any) => r.license_name))).sort();
-            scan.Build.push({
-                name: 'Open Source Licenses',
-                value: uniqueLicenses.join('\n')
-            });
-
+        if (selectedMetrics.includes(ToolName.TrivyOpen)) {
+            if (licenseRes.rowCount) {
+                const uniqueLicenses = Array.from(new Set(licenseRes.rows.map((r: any) => r.license_name))).sort();
+                scan.Build.push({
+                    name: 'Open Source Licenses',
+                    value: uniqueLicenses.join('\n')
+                });
+            } else {
+                scan.Build.push({
+                    name: 'Open Source Licenses',
+                    value: 'No licenses found.'
+                });
+            }
         }
 
 
         // Plan metrics
-        if (planMetrics.rowCount) {
-            const p = planMetrics.rows[0];
-            scan.Plan.push(
-                { name: 'Completion Rate', value: (p.estimated_vs_completed_story_points ? Number(p.estimated_vs_completed_story_points || 0).toFixed(1) + '%' : '-') }
-            );
-            scan.Plan.push(
-                { name: 'Security Requirements Coverage', value : (p.security_requirements_coverage ? Number(p.security_requirements_coverage || 0).toFixed(1) + '%' : '-') }
-            );
+
+        if (selectedMetrics.includes(ToolName.JiraSprintPoints)) {
+            if (planMetrics.rowCount) {
+                const p = planMetrics.rows[0];
+                scan.Plan.push(
+                    { name: 'Completion Rate', value: (p.estimated_vs_completed_story_points ? Number(p.estimated_vs_completed_story_points || 0).toFixed(1) + '%' : '-') }
+                );
+            } else {
+                scan.Plan.push(
+                    { name: 'Completion Rate', value: 'No data available.' }
+                );
+            }
         }
 
-        // Operate and Monitor metrics
-        if (OperateMonitorMetrics.rowCount) {
-            const o = OperateMonitorMetrics.rows[0];
-            scan.OperateMonitor.push(
-                { name: 'Security Incidents', value: (o.security_incidents ? Number(o.security_incidents || 0).toFixed(1) : '-') },
-                { name: 'Defect Density per KLOC', value : (o.defect_density ? Number(o.defect_density || 0).toFixed(1) : '-') },
-                { name: 'Mean Time to Recover (MTTR)', value: Number(o.mttr).toFixed(2) + ' hours' }
-            );
+        if (selectedMetrics.includes(ToolName.JiraSecurityEpics)) {
+            if (planMetrics.rowCount) {
+                const p = planMetrics.rows[0];
+                scan.Plan.push(
+                    { name: 'Security Requirements Coverage', value : (p.security_requirements_coverage ? Number(p.security_requirements_coverage || 0).toFixed(1) + '%' : '-') }
+                );
+            } else {
+                scan.Plan.push(
+                    { name: 'Security Requirements Coverage', value: 'No data available.' }
+                );
+            }
         }
 
-        //Deploy release metrics
-        if (deployReleaseRes.rowCount) {
-            const d = deployReleaseRes.rows[0];
-            if (d.deployment_time !== null) {
+        if (selectedMetrics.includes(ToolName.JiraSecurityIncidents)) {
+            if (planMetrics.rowCount) {
+                const o = OperateMonitorMetrics.rows[0];
+                scan.OperateMonitor.push(
+                    { name: 'Security Incidents', value: (o.security_incidents ? Number(o.security_incidents || 0) : '-') },
+                );
+            } else {
+                scan.OperateMonitor.push(
+                    { name: 'Security Incidents', value: 'No data available.' }
+                );
+            }
+        }
+
+        if (selectedMetrics.includes(ToolName.JiraDefectDensity)) {
+            if (OperateMonitorMetrics.rowCount) {
+                const o = OperateMonitorMetrics.rows[0];
+                scan.OperateMonitor.push(
+                    { name: 'Defect Density per KLOC', value : (o.defect_density ? Number(o.defect_density || 0) : '-') },
+                );
+            } else {
+                scan.OperateMonitor.push(
+                    { name: 'Defect Density per KLOC', value: 'No data available.' }
+                );
+            }
+        }
+
+        if (selectedMetrics.includes(ToolName.MTTR)) {
+            // Operate and Monitor metrics
+            if (OperateMonitorMetrics.rowCount) {
+                const o = OperateMonitorMetrics.rows[0];
+                scan.OperateMonitor.push(
+                    {name: 'Mean Time to Recover (MTTR)', value: Number(o.mttr).toFixed(4) + ' hours'}
+                );
+            } else {
+                scan.OperateMonitor.push(
+                    {name: 'Mean Time to Recover (MTTR)', value: 'No data available.'}
+                );
+            }
+        }
+
+        if (selectedMetrics.includes(ToolName.DeploymentFrequency)) {
+            if (deployReleaseRes.rowCount) {
+                const o = deployReleaseRes.rows[0];
+                scan.DeployRelease.push(
+                    {name: 'Average Deployment Frequency', value: Number(o.deployment_frequency).toFixed(2) + ' per day'}
+                );
+            } else {
+                scan.DeployRelease.push(
+                    {name: 'Average Deployment Frequency', value: 'No data available.'}
+                );
+            }
+        }
+
+        if (selectedMetrics.includes(ToolName.DeploymentTime)) {
+            if (deployReleaseRes.rowCount) {
+                const d = deployReleaseRes.rows[0];
                 scan.DeployRelease.push({
                     name: 'Average Deployment Time',
                     value: Number(d.deployment_time).toFixed(2) + ' hours',
                 });
-            }
-            if (d.deployment_frequency !== null) {
+            } else {
                 scan.DeployRelease.push({
-                    name: 'Average Deployment Frequency',
-                    value: Number(d.deployment_frequency).toFixed(2) + ' per day',
+                    name: 'Average Deployment Time',
+                    value: 'No data available.'
                 });
             }
         }
-
-
 
         results.push(scan);
     }
